@@ -1,0 +1,49 @@
+﻿@model RoomRental.Models.Room
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<div class="container">
+    <h1>Изменение информации о помещении</h1>
+
+    <div class="create-form-container">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input class="filter-input" type="hidden" asp-for="RoomId" />
+            <div class="form-div">
+                <label asp-for="BuildingId" class="control-label"></label>
+                <select class="filter-input" asp-for="BuildingId" class="form-control" asp-items="ViewBag.BuildingId"></select>
+            </div>
+            <div class="form-div">
+                <label asp-for="RoomNumber" class="control-label"></label>
+                <input class="filter-input" type="number" min="1" asp-for="RoomNumber" class="form-control" placeholder="Номер комнаты" />
+                <span asp-validation-for="RoomNumber" class="text-danger"></span>
+            </div>
+            <div class="form-div">
+                <label asp-for="Area" class="control-label"></label>
+                <input class="filter-input" asp-for="Area" class="form-control" placeholder="Площадь" />
+                <span asp-validation-for="Area" class="text-danger"></span>
+            </div>
+            <div class="form-div">
+                <label asp-for="Description" class="control-label"></label>
+                <input class="filter-input" asp-for="Description" class="form-control" placeholder="Описание" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-div">
+                <label asp-for="Photos" class="control-label"></label>
+                <input class="filter-input" type="file" asp-for="Photos" class="form-control" accept="image/*" multiple placeholder="Фото" />
+                <span asp-validation-for="Photos" class="text-danger"></span>
+            </div>
+            <div class="buttons">
+                <a class="btn-primary submitButton-index" asp-action="Index">Возврат к списку</a>
+                <input class="submitButton-index" type="submit" value="Изменить" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

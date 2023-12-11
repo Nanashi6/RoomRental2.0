@@ -1,0 +1,60 @@
+﻿@model RoomRental.Models.Room
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<div class="container">
+    <h1>Удаление помещения</h1>
+
+    <h3>Вы действительно хотите удалить эту запись?</h3>
+    <div class="det-container">
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Building):</label>
+            @Html.DisplayFor(model => model.Building.Name)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.RoomNumber):</label>
+            @Html.DisplayFor(model => model.RoomNumber)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Area):</label>
+            @Html.DisplayFor(model => model.Area)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Description):</label>
+            @Html.DisplayFor(model => model.Description)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.RoomImages):</label>
+            <div class="glide">
+                <div class="glide__track" data-glide-el="track">
+                    <ul class="glide__slides">
+                        @foreach (var photo in Model.RoomImages)
+                        {
+                            <li class="glide__slide">
+                                <img style="width: 400px; height: 300px;" src="@photo.ImagePath" />
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="det-container">
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="RoomId" />
+            <input type="submit" value="Удалить" class="btn btn-danger" /> |
+            <a asp-action="Index" class="btn btn-primary">Возврат к списку</a>
+        </form>
+    </div>
+</div>
+<script src=@($"https://cdn.jsdelivr.net/npm/@glidejs/glide")></script>
+<script>
+    new Glide('.glide', {
+        type: 'carousel',
+        startAt: 0,
+        perView: 1,
+        autoplay: 5000,
+    }).mount();
+</script>

@@ -1,0 +1,36 @@
+﻿@model RoomRental.Models.Rental
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<div class="container">
+    <h1>Удаление аренды</h1>
+
+    <h3>Вы действительно хотите удалить эту запись?</h3>
+    <div class="det-container">
+        <div>
+            <label>@Html.DisplayNameFor(model => model.CheckInDate):</label>
+            @Html.DisplayFor(model => model.CheckInDate)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.CheckOutDate):</label>
+            @Html.DisplayFor(model => model.CheckOutDate)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.RentalOrganization):</label>
+            @Html.DisplayFor(model => model.RentalOrganization.Name)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Room):</label>
+            @(Model.Room.Building.Name), № @(Model.Room.RoomNumber)
+        </div>
+    </div>
+    <div class="det-container">
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="RentalId" />
+            <input type="submit" value="Удалить" class="btn btn-danger" /> |
+            <a asp-action="Index" class="btn btn-primary">Возврат к списку</a>
+        </form>
+    </div>
+</div>

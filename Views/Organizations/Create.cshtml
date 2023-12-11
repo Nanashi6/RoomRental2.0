@@ -1,0 +1,33 @@
+﻿@model RoomRental.Models.Organization
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="container">
+    <h1>Создание организации</h1>
+
+    <div class="create-form-container">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-div">
+                <label asp-for="Name" class="control-label"></label>
+                <input class="filter-input" asp-for="Name" class="form-control" placeholder="Название организации" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-div">
+                <label asp-for="PostalAddress" class="control-label"></label>
+                <input class="filter-input" asp-for="PostalAddress" class="form-control" placeholder="Почтовый адрес" />
+                <span asp-validation-for="PostalAddress" class="text-danger"></span>
+            </div>
+            <div class="buttons">
+                <a class="btn-primary submitButton-index" asp-action="Index">Возврат к списку</a>
+                <input class="submitButton-index" type="submit" value="Создать" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,100 @@
+﻿@model RoomRental.ViewModels.RoomsViewModel
+@{
+    ViewData["Title"] = "Rooms";
+    string buildingNameFind = Model.FilterViewModel.BuildingNameFind;
+    decimal? areaFind = Model.FilterViewModel.AreaFind;
+}
+
+
+<div class="index-container">
+    <div class="form-container">
+        <div class="tabs">
+            <h3>Фильтрация</h3>
+            <div><a asp-action="Create">Создать</a></div>
+        </div>
+        <div class="form-container_two">
+            <form method="get" asp-action="Filter">
+                <div class="form-div">
+                    <label class="white-label">Название здания</label>
+                    <input class="filter-input" name="BuildingNameFind" value="@buildingNameFind" placeholder="Название здания" />
+                </div>
+                <div class="form-div">
+                    <label class="white-label">Площадь</label>
+                    <input class="filter-input" type="text" step="any" name="AreaFind" value="@(areaFind)" placeholder="Площадь" oninput="this.value = this.value.replace(/[^0-9,]/g, '')" />
+                </div>
+
+                <input class="filter-input" type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
+                <input class="submitButton-index" type="submit" value="Поиск" />
+            </form>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h1>Помещения</h1>
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.BuildingNameSort)"
+                               asp-route-buildingNameFind="@buildingNameFind"
+                               asp-route-areaFind="@areaFind">
+                                @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Building)
+                            </a>
+                        </th>
+                        <th class="element">
+                            @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().RoomNumber)
+                        </th>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.AreaSort)"
+                               asp-route-buildingNameFind="@buildingNameFind"
+                               asp-route-areaFind="@areaFind">
+                                @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Area)
+                            </a>
+                        </th>
+                        <th class="element">
+                            @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Description)
+                        </th>
+                        <th class="element">
+                            @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().RoomImages)
+                        </th>
+                        <th class="element"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Rooms)
+                    {
+                        <tr class="row" onclick="location.href='@Url.Action("Details", "Rooms", new { id = item.RoomId })'">
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.Building.Name)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.RoomNumber)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.Area)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td class="element">
+                                <img src="@item.RoomImages.First().ImagePath" class="image">
+                            </td>
+                            <td class="element">
+                                <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.RoomId">Изменить</a> |
+                                <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.RoomId">Удалить</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <page-link page-model="Model.PageViewModel" page-action="Index"
+                   page-url-sortOrder="@(Model.SortViewModel.Current)"
+                   page-url-buildingNameFind="@buildingNameFind"
+                   page-url-areaFind="@areaFind"></page-link>
+    </div>
+</div>

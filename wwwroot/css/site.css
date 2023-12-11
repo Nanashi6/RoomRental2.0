@@ -1,0 +1,590 @@
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: content-box;
+    text-decoration: none;
+    list-style-type: none;
+    font-family: sans-serif;
+}
+
+select {
+    font-family: sans-serif;
+    font-size: 16px;
+}
+
+html, body {
+    height: 100%;
+}
+
+.wrapper {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+main, .container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+
+/*Формы входа и регистрации*/
+.loginLabel {
+    position: relative;
+    font-size: 14px;
+    color: rgb(87, 87, 87);
+}
+
+.loginInput {
+    margin-top: 10px;
+    width: 260px;
+    display: block;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    border-bottom: 1px solid black;
+    position: relative;
+}
+
+.loginHeader {
+    flex: 1 1 auto;
+    margin: 0 5px;
+    text-align: center;
+}
+
+.loginForm {
+    flex: 1 1 auto;
+    margin: 0 5px;
+}
+
+.block {
+    text-align: center;
+    margin-top: 10px;
+}
+
+    .block a {
+        color: #e84545;
+        transition: linear 0.2s;
+    }
+
+        .block a:hover {
+            color: #e52e2e;
+        }
+
+    .block ul {
+        padding: 0;
+    }
+
+.parent {
+    background: #3a3e64;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loginContainer {
+    width: 300px;
+    margin: -5px 0;
+    border-radius: 10px;
+    padding: 25px 35px;
+    background: white;
+}
+
+.submitButton {
+    text-decoration: none;
+    display: inline-block;
+    width: 290px;
+    line-height: 45px;
+    border: 0;
+    border-radius: 2px;
+    margin: 10px 0;
+    font-size: 15px;
+    text-align: center;
+    font-weight: 300;
+    color: white;
+    background: #e84545;
+    transition: linear 0.3s;
+}
+
+    .submitButton:hover {
+        cursor: pointer;
+        background: #e52e2e;
+    }
+
+/*Панель навигации*/
+header {
+    border-bottom: 2px solid black;
+    background: #3a3e64;
+}
+
+    header > div {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 15px 0;
+    }
+
+nav {
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+    nav > div > a {
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 13px;
+        font-weight: 700;
+        margin-left: 10px;
+        text-transform: uppercase;
+        transition: 0.2s;
+    }
+
+        nav > div > a:hover {
+            color: #fff;
+        }
+
+.logo > a {
+    color: rgba(255, 255, 255, 0.582);
+    font-size: 20px;
+    font-weight: 700;
+    margin-left: 40px;
+    text-transform: uppercase;
+    transition: 0.2s;
+}
+
+    .logo > a:hover {
+        color: #fff;
+    }
+
+.nav-log-elements:last-child {
+    margin-right: 40px;
+}
+
+.nav-tables:first-child {
+    margin-left: 40px;
+}
+
+.user-ref {
+    color: white;
+}
+
+    .user-ref:hover {
+        color: #e84545;
+    }
+
+
+
+
+
+.dropdown {
+    float: left;
+    overflow: hidden;
+}
+
+    .dropdown .dropbtn {
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 13px;
+        font-weight: 700;
+        margin-left: 10px;
+        text-transform: uppercase;
+        transition: 0.2s;
+    }
+    .dropdown .dropbtn:hover {
+        color: #fff;
+    }
+.dropdown-content {
+    border-top: 15px solid transparent;
+    display: none;
+    position: absolute;
+    min-width: fit-content;
+    z-index: 1;
+}
+    .dropdown-content a {
+        float: none;
+        color: white;
+        padding: 12px 16px;
+        border: 2px dashed black;
+        background: #e84545;
+        text-decoration: none;
+        display: block;
+        text-align: left;
+    }
+
+        .dropdown-content a:hover {
+            cursor: pointer;
+            background: #e52e2e;
+        }
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+/*Панель навигации*/
+/*Home/Privacy*/
+.text-center {
+    text-align: center;
+}
+/*Home/Privacy*/
+
+/*Index*/
+.index-container {
+    display: flex;
+    flex-direction: row;
+    flex: 1 1 auto;
+}
+
+.form-container {
+    background: #3a3e64;
+    width: 25%;
+    margin: 5px 0;
+    border-radius: 0px 3px 3px 0px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tabs {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+    .tabs h3 {
+        width: 50%;
+        padding: 5px;
+        color: white;
+    }
+
+    .tabs div {
+        width: 100%;
+        position: relative;
+        display: flex;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+        .tabs div a {
+            background-color: #e84545;
+            border-radius: 0px 3px 0px 15px;
+            display: block;
+            padding: 7px 5px 5px 5px;
+            width: 100%;
+            color: white;
+            transition: linear 0.3s;
+        }
+
+            .tabs div a:hover {
+                background-color: #e52e2e;
+            }
+
+.form-container_two {
+    padding-top: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+    .form-container_two > form {
+        width: 90%;
+        position: relative;
+    }
+
+.form-div {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin-top: 8px;
+}
+
+.form-div label {
+    margin-left: 7px;
+}
+.white-label {
+    color: white;
+}
+
+.submitButton-index {
+    text-decoration: none;
+    display: inline-block;
+    line-height: 45px;
+    border: 0;
+    border-radius: 2px;
+    margin: 10px 0;
+    font-size: 15px;
+    text-align: center;
+    font-weight: 300;
+    color: white;
+    background: #e84545;
+    transition: linear 0.3s;
+    width: 100%;
+}
+
+    .submitButton-index:hover {
+        cursor: pointer;
+        background: #e52e2e;
+    }
+
+.filter-input {
+    margin-top: 2px;
+    display: block;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    border-bottom: 1px solid black;
+    width: -webkit-fill-available;
+}
+
+.table-container {
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.row {
+    border-bottom: 1px solid rgba(87, 87, 87, 0.7);
+    transition: 0.3s linear;
+}
+.row:hover {
+    background-color: lightgray;
+}
+
+.element {
+    padding: 10px 10px;
+    text-align: center;
+}
+.element:only-child {
+    margin: 0 auto;
+}
+
+.table-container > h1 {
+    text-align: center;
+}
+
+.table-container > div {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    padding: 15px 0;
+}
+
+.table {
+    border-collapse: collapse;
+}
+
+    .table > thead {
+        border-bottom: 2px solid black;
+    }
+.pagination {
+    display: flex;
+}
+
+.page-link {
+    color: rgba(13,108,253,1);
+}
+
+.page-item {
+    padding: 6px 8px;
+    border-color: rgba(87, 87, 87, 0.7);
+}
+
+.active {
+    background: rgba(13,108,253,1);
+}
+
+    .active > .page-link {
+        color: white;
+    }
+
+a {
+    color: rgba(13,108,253,1);
+}
+
+.btn {
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn-danger {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+    .btn-danger:hover {
+        color: #fff;
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+    }
+
+.btn-primary {
+    color: #fff;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+    .btn-primary:hover {
+        color: #fff;
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+    }
+
+.btn-secondary {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+    .btn-secondary:hover {
+        color: #fff;
+        background-color: #5c636a;
+        border-color: #565e64;
+    }
+/*Index*/
+
+/*Create / Edit*/
+.create-form-container {
+    position: relative;
+    width: fit-content;
+    margin: 0 auto;
+    width: 26%;
+}
+    .create-form-container form {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+.container {
+    display: flex;
+    margin: 20px 0px;
+    flex-direction: column;
+    text-align: center;
+    justify-items: center;
+}
+.container h1 {
+    display: inline;
+    margin: 0 auto;
+    border-bottom: 1px solid black;
+}
+
+.buttons{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+/*Create / Edit*/
+
+/*Details / Delete*/
+.details-container {
+    display: flex;
+    padding: 0px 0px 0px 5px;
+    flex-direction: column;
+    text-align: left;
+    justify-items: left;
+    width: 30%;
+    border-right: 1px dashed black;
+}
+    .details-container h1 {
+        display: inline;
+        margin: 0 auto;
+        border-bottom: 1px solid black;
+    }
+.row-flexbox {
+    margin: 20px;
+    display: flex;
+    flex-direction: row;
+}
+.chart-table-container {
+    width:100%;
+}
+.chart-table-container form{
+    margin-left: 20px;
+    display: flex;
+    flex-direction: row;
+}
+.chart-table-container canvas {
+    padding: 0px 10px;
+}
+.det-container {
+    margin-top: 10px;
+}
+    .det-container div {
+        margin-top: 5px;
+    }
+.det-container div label {
+    font-weight: bold;
+}
+/*Details / Delete*/
+
+
+/*FOOTER*/
+footer {
+    background-color: #3a3e64;
+}
+
+footer {
+    border-top: 1px solid rgba(87,87,87,0.4);
+}
+
+.footer_copyright {
+    background-color: #313454;
+    padding: 20px 0;
+}
+
+.copyright_text {
+    font-size: 14px;
+    color: #808080;
+    line-height: 1.5;
+    text-align: center;
+}
+
+    .copyright_text span a {
+        color: white;
+        transition: linear 0.2s;
+    }
+
+        .copyright_text span a:hover {
+            color: #e52e2e;
+        }
+/*Image*/
+
+.image {
+    width: 200px;
+    height: 200px;
+}
+
+input,
+input::placeholder {
+    font-size: 16px;
+}
+
+/* Validation error */
+.text-danger {
+    color: red;
+}

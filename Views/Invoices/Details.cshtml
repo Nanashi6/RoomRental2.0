@@ -1,0 +1,83 @@
+﻿@model RoomRental.Models.Invoice
+@inject RoomRental.Services.RoomService rooms
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="container">
+    <h1>Счет оплаты</h1>
+    <div class="det-container">
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Amount):</label>
+            @Html.DisplayFor(model => model.Amount)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.ConclusionDate):</label>
+            @Html.DisplayFor(model => model.ConclusionDate)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.PaymentDate):</label>
+            @Html.DisplayFor(model => model.PaymentDate)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.RentalOrganization):</label>
+            @Html.DisplayFor(model => model.RentalOrganization.Name)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.ResponsiblePerson):</label>
+            @Model.ResponsiblePerson.SNL
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Room):</label>
+            @((await rooms.TryGet(Model.RoomId)).Building.Name), № @((await rooms.TryGet(Model.RoomId)).RoomNumber)
+        </div>
+    </div>
+    <div class="det-container">
+        <a class="btn-primary btn" asp-action="Edit" asp-route-id="@Model?.InvoiceId">Изменить</a> |
+        <a class="btn-primary btn" asp-action="Index">Возврат к списку</a>
+    </div>
+</div>
+@* 
+<h1>Details</h1>
+
+<div>
+    <h4>Invoice</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Amount)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Amount)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.PaymentDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.PaymentDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.RentalOrganization)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.RentalOrganization.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.ResponsiblePerson)
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.ResponsiblePerson.Surname @Model.ResponsiblePerson.Name @Model.ResponsiblePerson.Lastname
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.RoomId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.RoomId)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.InvoiceId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div> *@

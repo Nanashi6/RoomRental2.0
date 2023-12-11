@@ -1,0 +1,32 @@
+﻿@model RoomRental.Models.Organization
+@inject UserManager<User> userManager
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="container">
+	<h1>Организация</h1>
+    <div class="det-container">
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Name):</label>
+            @Html.DisplayFor(model => model.Name)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.PostalAddress):</label>
+            @Html.DisplayFor(model => model.PostalAddress)
+        </div>
+	</div>
+	<div class="det-container">
+        @if (User.IsInRole("Admin") || userManager.GetUserAsync(User).Result.OrganizationId == Model.OrganizationId)
+        {
+            <a class="btn-primary btn" asp-action="Edit" asp-route-id="@Model?.OrganizationId">Изменить</a>
+        }
+        @if(User.IsInRole("Admin"))
+        {
+           <span>|</span><a class="btn-primary btn" asp-action="Index">Возврат к списку</a>
+        }
+	</div>
+</div>
+
+
+

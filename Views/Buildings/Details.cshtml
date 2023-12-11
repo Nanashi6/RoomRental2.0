@@ -1,0 +1,208 @@
+﻿@model RoomRental.Models.Building
+
+@{
+    ViewData["Title"] = "Details";
+    var percentages = ViewBag.Percentage;
+}
+
+<div class="row-flexbox">
+    <div class="details-container">
+        <h1>Здание</h1>
+        <div class="det-container">
+            <div>
+                <label>@Html.DisplayNameFor(model => model.Name):</label>
+                @Html.DisplayFor(model => model.Name)
+            </div>
+            <div>
+                <label>@Html.DisplayNameFor(model => model.PostalAddress):</label>
+                @Html.DisplayFor(model => model.PostalAddress)
+            </div>
+            <div>
+                <label>@Html.DisplayNameFor(model => model.Floors):</label>
+                @Html.DisplayFor(model => model.Floors)
+            </div>
+            <div>
+                <label>@Html.DisplayNameFor(model => model.Description):</label>
+                @Html.DisplayFor(model => model.Description)
+            </div>
+            <div class="images-container">
+                <label>@Html.DisplayNameFor(model => model.FloorPlan):</label>
+                <img src="@Model.FloorPlan" />
+            </div>
+            <div>
+                <label>Общая площадь помещений:</label>
+                @ViewBag.Area
+            </div>
+            <div>
+                <label>@Html.DisplayNameFor(model => model.OwnerOrganization):</label>
+                @Html.DisplayFor(model => model.OwnerOrganization.Name)
+            </div>
+        </div>
+        <div class="det-container">
+            <a class="btn-primary btn" asp-action="Edit" asp-route-id="@Model?.BuildingId">Изменить</a> |
+            <a class="btn-primary btn" asp-action="Index">Возврат к списку</a>
+        </div>
+    </div>
+    <div class="chart-table-container">
+        <form method="get">
+            <div class="form-div">
+                <label>Дата начала промежутка</label>
+                <input class="filter-input" type="date" name="startDate" id="startDate" value=@(ViewBag.StartDate.ToString("yyyy-MM-dd")) />
+            </div>
+
+            <div class="form-div">
+                <label>Дата конца промежутка</label>
+                <input class="filter-input" type="date" name="endDate" id="endDate" value=@(ViewBag.EndDate.ToString("yyyy-MM-dd")) />
+            </div>
+
+            <div class="form-div">
+                <input class="submitButton-index" type="submit" value="Поиск" />
+            </div>
+        </form>
+        <canvas id="myChart"></canvas>
+        <div id="tableContainer" class="table-container chart-table"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var daysData = @Html.Raw(Json.Serialize(ViewBag.DaysRentals));
+    var labels = daysData.map(function (day) {
+        var date = new Date(day.date);
+        var dayOfMonth = date.getDate();
+        var month = date.getMonth() + 1;
+        if (month < 10) {
+            month = '0' + month;
+        }
+        if (dayOfMonth < 10) {
+            dayOfMonth = '0' + dayOfMonth;
+        }
+        var year = date.getFullYear();
+        return dayOfMonth + '.' + month + '.' + year;
+    });
+    var percentages = daysData.map(function (day) { return day.percentage; });
+
+    var chartData = {
+        labels: labels,
+        datasets: [{
+            label: "График аренды помещений",
+            data: percentages,
+            backgroundColor: "rgba(54, 162, 235, 0.5)",
+            borderColor: "rgba(54, 162, 235, 1)",
+            borderWidth: 1
+        }]
+    };
+
+    // Создание и отображение графика
+    var ctx = document.getElementById("myChart").getContext("2d");
+    var myChart = new Chart(ctx, {
+        type: "line",
+        data: chartData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            var label = "";
+                            if (label) {
+                                label += ": ";
+                            }
+                            label += context.parsed.y.toFixed(2) + "%";
+                            return label;
+                        },
+                    },
+                },
+            },
+            onClick: function (e, elements) {
+                if (elements.length > 0) {
+                    var index = elements[0].index;
+                    var selectedData = daysData[index];
+                    var date = selectedData.date;
+
+                    // Выполнение AJAX-запроса
+                    $.ajax({
+                        url: '/Buildings/GetRentedRooms?buildingId=' + @(Model.BuildingId) +"&currentDate=" + date,
+                        type: 'GET',
+                        data: { date: date },
+                        success: function (data) {
+                            // Очистка существующей таблицы (если есть)
+                            $('#tableContainer').empty();
+
+                            // Создание таблицы
+                            var table = $('<table>').addClass('table');
+
+                            // Создание заголовка таблицы
+                            var thead = $('<thead>');
+                            var headerRow = $('<tr>');
+                            headerRow.append($('<th>').addClass('element').text('Помещение'));
+                            headerRow.append($('<th>').addClass('element').text('Организация-арендатор'));
+                            headerRow.append($('<th>').addClass('element').text('Дата въезда'));
+                            headerRow.append($('<th>').addClass('element').text('Дата выезда'));
+                            thead.append(headerRow);
+                            table.append(thead);
+
+                            // Создание тела таблицы
+                            var tbody = $('<tbody>');
+                            data.forEach(function (item) {
+                                var row = $('<tr>').addClass('row');
+                                var roomNumberCell = $('<td>').addClass('element');
+                                var organizationCell = $('<td>').addClass('element');
+
+                                var roomNumberLink = $('<a>').attr('href', '/Rooms/Details/' + item.room.roomId).text("№ " + item.room.roomNumber);
+                                roomNumberCell.append(roomNumberLink);
+
+                                var organizationLink = $('<a>').attr('href', '/Organizations/Details/' + item.rentalOrganization.organizationId).text(item.rentalOrganization.name);
+                                organizationCell.append(organizationLink);
+
+                                row.append(roomNumberCell);
+                                row.append(organizationCell);
+                                row.append($('<td>').addClass('element').text(new Date(item.checkInDate).toLocaleDateString()));
+                                row.append($('<td>').addClass('element').text(new Date(item.checkOutDate).toLocaleDateString()));
+                                tbody.append(row);
+                            });
+                            table.append(tbody);
+
+                            var h1 = $("<h1>").text(labels[index]);
+                            $("#tableContainer").append(h1);
+                            // Добавление таблицы в контейнер
+                            $('#tableContainer').append(table);
+                        },
+                        error: function (xhr, status, error) {
+                            // Обработка ошибки при выполнении запроса
+                            console.log(error);
+                        }
+                    });
+                }
+            }
+        }
+    });
+
+</script>
+<script>
+    // Получаем ссылки на поля ввода дат
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+
+    // Добавляем обработчик события изменения для поля ввода даты начала промежутка
+    startDateInput.addEventListener('change', function () {
+        // Проверяем, если значение даты конца промежутка меньше значения даты начала промежутка, устанавливаем значение даты конца равным значению даты начала
+        if (new Date(endDateInput.value) < new Date(startDateInput.value)) {
+            endDateInput.value = startDateInput.value;
+        }
+    });
+
+    // Добавляем обработчик события изменения для поля ввода даты конца промежутка
+    endDateInput.addEventListener('change', function () {
+        // Проверяем, если значение даты конца промежутка меньше значения даты начала промежутка, устанавливаем значение даты начала равным значению даты конца
+        if (new Date(endDateInput.value) < new Date(startDateInput.value)) {
+            startDateInput.value = endDateInput.value;
+        }
+    });
+</script>

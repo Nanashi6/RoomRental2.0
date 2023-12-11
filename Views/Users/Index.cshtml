@@ -1,0 +1,43 @@
+﻿@model IEnumerable<User>
+@inject RoomRental.Services.OrganizationService organizations
+@{
+    ViewBag.Title = "Список пользователей";
+}
+
+<div class="table-container">
+    <h1>Список пользователей</h1>
+    <div>
+        <table class="table">
+            <tr style="border-bottom: 2px solid black;">
+                <th class="element">Логин</th>
+                <th class="element">Email</th>
+                <th class="element">Фамилия</th>
+                <th class="element">Имя</th>
+                <th class="element">Отчество</th>
+                <th class="element">Организация</th>
+                <th></th>
+            </tr>
+            @foreach (var user in Model)
+            {
+                <tr class="row">
+                    <td class="element">@user.UserName</td>
+                    <td class="element">@user.Email</td>
+                    <td class="element">@user.Surname</td>
+                    <td class="element">@user.Name</td>
+                    <td class="element">@user.Lastname</td>
+                    <td class="element">@((await organizations.Get(user.OrganizationId)).Name)</td>
+                    <td class="element">
+                        <form asp-action="Delete" asp-route-id="@user.Id" method="post">
+                            <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@user.Id">Изменить</a>
+                            <a class="btn btn-sm btn-primary" asp-action="ChangePassword" asp-route-id="@user.Id">Сменить пароль</a>
+                            <a class="btn btn-sm btn-secondary" asp-controller="Roles" asp-action="Edit" asp-route-userid="@user.Id">Права доступа</a>
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                Удалить
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

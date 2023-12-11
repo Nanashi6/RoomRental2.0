@@ -1,0 +1,133 @@
+﻿@model RoomRental.ViewModels.RentalsViewModel
+
+@{
+    ViewData["Title"] = "Rentals";
+
+    string organizationNameFind = Model.FilterViewModel.OrganizationNameFind;
+    DateTime? checkInDateStartFind = Model.FilterViewModel.CheckInDateStartFind;
+    DateTime? checkInDateEndFind = Model.FilterViewModel.CheckInDateEndFind;
+    DateTime? checkOutDateStartFind = Model.FilterViewModel.CheckOutDateStartFind;
+    DateTime? checkOutDateEndFind = Model.FilterViewModel.CheckOutDateEndFind;
+    int? BuildingIdFind = Model.FilterViewModel.BuildingIdFind;
+}
+
+
+<div class="index-container">
+    <div class="form-container">
+        <div class="tabs">
+            <h3>Фильтрация</h3>
+            <div><a asp-action="Create">Создать</a></div>
+        </div>
+        <div class="form-container_two">
+            <form method="get" asp-action="Filter">
+                <div class="form-div">
+                    <label class="white-label">Название организации</label>
+                    <input class="filter-input" name="OrganizationNameFind" value="@organizationNameFind"  placeholder="Название организации"/>
+                </div>
+                <div class="form-div">
+                    <label class="white-label">Здание</label>
+                    <select class="filter-input" name="BuildingIdFind" asp-items="ViewBag.BuildingId"></select>
+                </div>
+                <div class="form-div">
+                    <label class="white-label">Дата въезда (От)</label>
+                    <input class="filter-input" type="date" name="CheckInDateStartFind" value="@checkInDateStartFind?.ToString("yyyy-MM-dd")" placeholder="Дата въезда" />
+                </div>
+                <div class="form-div">
+                    <label class="white-label">Дата въезда (До)</label>
+                    <input class="filter-input" type="date" name="CheckInDateEndFind" value="@checkInDateEndFind?.ToString("yyyy-MM-dd")" placeholder="Дата въезда" />
+                </div>
+                <div class="form-div">
+                    <label class="white-label">Дата выезда (От)</label>
+                    <input class="filter-input" type="date" name="CheckOutDateStartFind" value="@checkOutDateStartFind?.ToString("yyyy-MM-dd")" placeholder="Дата выезда" />
+                </div>
+                <div class="form-div">
+                    <label class="white-label">Дата выезда (До)</label>
+                    <input class="filter-input" type="date" name="CheckOutDateEndFind" value="@checkOutDateEndFind?.ToString("yyyy-MM-dd")" placeholder="Дата выезда" />
+                </div>
+                <input class="filter-input" type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
+                <input class="submitButton-index" type="submit" value="Поиск" />
+            </form>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h1>Аренды</h1>
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="element">
+                            @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().RoomId)
+                        </th>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.OrganizationNameSort)"
+                               asp-route-organizationNameFind="@organizationNameFind"
+                               asp-route-checkInDateStartFind="@checkInDateStartFind"
+                               asp-route-checkInDateEndFind="@checkInDateEndFind"
+                               asp-route-checkOutDateStartFind="@checkOutDateStartFind"
+                               asp-route-checkOutDateEndFind="@checkOutDateEndFind">
+                                @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().RentalOrganization)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.CheckInDateSort)"
+                               asp-route-organizationNameFind="@organizationNameFind"
+                               asp-route-checkInDateStartFind="@checkInDateStartFind"
+                               asp-route-checkInDateEndFind="@checkInDateEndFind"
+                               asp-route-checkOutDateStartFind="@checkOutDateStartFind"
+                               asp-route-checkOutDateEndFind="@checkOutDateEndFind">
+                                @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().CheckInDate)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.CheckOutDateSort)"
+                               asp-route-organizationNameFind="@organizationNameFind"
+                               asp-route-checkInDateStartFind="@checkInDateStartFind"
+                               asp-route-checkInDateEndFind="@checkInDateEndFind"
+                               asp-route-checkOutDateStartFind="@checkOutDateStartFind"
+                               asp-route-checkOutDateEndFind="@checkOutDateEndFind">
+                                @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().CheckOutDate)
+                            </a>
+                        </th>
+                        <th class="element"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Rentals)
+                    {
+                        <tr class="row" onclick="location.href='@Url.Action("Details", "Rentals", new { id = item.RentalId })'">
+                            <td class="element">
+                                @* @((await buildings.TryGet(item.Room.BuildingId)).Name),<br /> *@ @(item.Room.Building.Name) № @(item.Room.RoomNumber)
+                            </td>
+                            <td class="element">
+                                <a asp-controller="Organizations" asp-action="Details" asp-route-id="@item.RentalOrganizationId" >@Html.DisplayFor(modelItem => item.RentalOrganization.Name) </a>
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.CheckInDate)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.CheckOutDate)
+                            </td> 
+                            <td class="element">
+                                <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.RentalId">Изменить</a> |
+                                @* <a class="btn-secondary btn" asp-action="Details" asp-route-id="@item.RentalId">Подробнее</a> | *@
+                                <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.RentalId">Удалить</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <page-link page-model="Model.PageViewModel" page-action="Index"
+                   page-url-sortOrder="@(Model.SortViewModel.Current)"
+                   page-url-organizationNameFind="@organizationNameFind"
+                   page-url-checkInDateStartFind="@checkInDateStartFind"
+                   page-url-checkInDateEndFind="@checkInDateEndFind"
+                   page-url-checkOutDateStartFind="@checkOutDateStartFind"
+                   page-url-checkOutDateEndFind="@checkOutDateEndFind"></page-link>
+    </div>
+</div>

@@ -1,0 +1,53 @@
+﻿@model RoomRental.Models.Building
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<div class="container">
+    <h1>Изменение здания</h1>
+
+    <div class="create-form-container">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input class="filter-input" type="hidden" asp-for="BuildingId" />
+            <div class="form-div">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="filter-input" placeholder="Название" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-div">
+                <label asp-for="OwnerOrganizationId" class="control-label"></label>
+                <select id="select" asp-for="OwnerOrganizationId" class="filter-input" asp-items="ViewBag.OwnerOrganizationId"></select>
+            </div>
+            <div class="form-div">
+                <label asp-for="PostalAddress" class="control-label"></label>
+                <input asp-for="PostalAddress" class="filter-input" placeholder="Почтовый адрес" />
+                <span asp-validation-for="PostalAddress" class="text-danger"></span>
+            </div>
+            <div class="form-div">
+                <label asp-for="Floors" class="control-label"></label>
+                <input asp-for="Floors" min="0" class="filter-input" placeholder="Этажность" />
+                <span asp-validation-for="Floors" class="text-danger"></span>
+            </div>
+            <div class="form-div">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="filter-input" placeholder="Описание" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-div">
+                <label asp-for="FloorPlanImage" class="control-label"></label>
+                <input type="file" asp-for="FloorPlanImage" class="filter-input" accept="image/*" placeholder="Фото помещения" />
+                <span asp-validation-for="FloorPlanImage" class="text-danger"></span>
+            </div>
+            <div class="buttons">
+                <a class="btn-primary submitButton-index" asp-action="Index">Возврат к списку</a>
+                <input class="submitButton-index" type="submit" value="Изменить" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

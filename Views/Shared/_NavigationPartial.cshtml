@@ -1,0 +1,32 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+@* @{
+    var user = await UserManager.GetUserAsync(User);
+    var lastName = user.Surname + " " + user.Name;
+} *@
+<div class="nav-tables">
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <a asp-area="" asp-controller="Buildings" asp-action="Index">Здания</a>
+        <a asp-area="" asp-controller="Rooms" asp-action="Index">Помещения</a>
+        <a asp-area="" asp-controller="Rentals" asp-action="Index">Аренда</a>
+        <a asp-area="" asp-controller="Invoices" asp-action="Index">Счета</a>
+    }
+    else if (User.IsInRole("Admin"))
+    {
+        <a asp-area="" asp-controller="Organizations" asp-action="Index">Организации</a>
+        <a asp-area="" asp-controller="Buildings" asp-action="Index">Здания</a>
+        <a asp-area="" asp-controller="Rooms" asp-action="Index">Помещения</a>
+        <a asp-area="" asp-controller="Rentals" asp-action="Index">Аренда</a>
+        <a asp-area="" asp-controller="Invoices" asp-action="Index">Счета</a>
+    }
+    else if (User.IsInRole("User"))
+    {
+        <a asp-area="" asp-controller="Organizations" asp-action="Details" asp-route-id=@UserManager.GetUserAsync(User).Result?.OrganizationId>Организация</a>
+        <a asp-area="" asp-controller="Buildings" asp-action="Index">Здания</a>
+        <a asp-area="" asp-controller="Rooms" asp-action="Index">Помещения</a>
+        <a asp-area="" asp-controller="Rentals" asp-action="Index">Аренда</a>
+        <a asp-area="" asp-controller="Invoices" asp-action="Index">Счета</a>
+    }
+</div>

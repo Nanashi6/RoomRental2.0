@@ -1,0 +1,72 @@
+﻿@model RoomRental.Models.Room
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="container">
+    <h1>Помещение</h1>
+    <div class="det-container">
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Building):</label>
+            @Html.DisplayFor(model => model.Building.Name)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.RoomNumber):</label>
+            @Html.DisplayFor(model => model.RoomNumber)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Area):</label>
+            @Html.DisplayFor(model => model.Area)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Description):</label>
+            @Html.DisplayFor(model => model.Description)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.RoomImages):</label>
+            <div class="glide">
+                <div class="glide__track" data-glide-el="track">
+                    <ul class="glide__slides">
+                        @foreach (var photo in Model.RoomImages)
+                        {
+                            <li class="glide__slide">
+                                <img style="width: 400px; height: 300px;" src="@photo.ImagePath" />
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+@*             <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    @foreach (var photo in Model.RoomImages)
+                    {
+                        <div class="swiper-slide"><img src="@photo.ImagePath" /></div>
+                    }
+                </div>
+            </div> *@
+        </div>
+    </div>
+    <div class="det-container">
+        <a class="btn-primary btn" asp-action="Edit" asp-route-id="@Model?.RoomId">Изменить</a> |
+        <a class="btn-primary btn" asp-action="Index">Возврат к списку</a>
+    </div>
+</div>
+
+@* <script>
+    var swiper = new Swiper('.swiper-container', {
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+    });
+</script> *@
+<script src=@($"https://cdn.jsdelivr.net/npm/@glidejs/glide")></script>
+<script>
+    new Glide('.glide', {
+        type: 'carousel',
+        startAt: 0,
+        perView: 1,
+        autoplay: 5000,
+    }).mount();
+</script>
