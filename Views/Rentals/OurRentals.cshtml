@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Rentals";
 
-    string organizationNameFind = Model.FilterViewModel.OrganizationNameFind;
     DateTime? checkInDateStartFind = Model.FilterViewModel.CheckInDateStartFind;
     DateTime? checkInDateEndFind = Model.FilterViewModel.CheckInDateEndFind;
     DateTime? checkOutDateStartFind = Model.FilterViewModel.CheckOutDateStartFind;
@@ -19,11 +18,7 @@
             <div><a asp-action="Create">Создать</a></div>
         </div>
         <div class="form-container_two">
-            <form method="get" asp-action="Filter">
-                <div class="form-div">
-                    <label class="white-label">Название организации</label>
-                    <input class="filter-input" name="OrganizationNameFind" value="@organizationNameFind"  placeholder="Название организации"/>
-                </div>
+            <form method="get" asp-action="OurFilter">
                 <div class="form-div">
                     <label class="white-label">Здание</label>
                     <select class="filter-input" name="BuildingIdFind" asp-items="ViewBag.BuildingId"></select>
@@ -60,9 +55,8 @@
                             @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().RoomId)
                         </th>
                         <th class="element">
-                            <a asp-action="Index"
+                            <a asp-action="OurRentals"
                                asp-route-sortOrder="@(Model.SortViewModel.OrganizationNameSort)"
-                               asp-route-organizationNameFind="@organizationNameFind"
                                asp-route-checkInDateStartFind="@checkInDateStartFind"
                                asp-route-checkInDateEndFind="@checkInDateEndFind"
                                asp-route-checkOutDateStartFind="@checkOutDateStartFind"
@@ -71,9 +65,8 @@
                             </a>
                         </th>
                         <th class="element">
-                            <a asp-action="Index"
+                            <a asp-action="OurRentals"
                                asp-route-sortOrder="@(Model.SortViewModel.CheckInDateSort)"
-                               asp-route-organizationNameFind="@organizationNameFind"
                                asp-route-checkInDateStartFind="@checkInDateStartFind"
                                asp-route-checkInDateEndFind="@checkInDateEndFind"
                                asp-route-checkOutDateStartFind="@checkOutDateStartFind"
@@ -82,9 +75,8 @@
                             </a>
                         </th>
                         <th class="element">
-                            <a asp-action="Index"
+                            <a asp-action="OurRentals"
                                asp-route-sortOrder="@(Model.SortViewModel.CheckOutDateSort)"
-                               asp-route-organizationNameFind="@organizationNameFind"
                                asp-route-checkInDateStartFind="@checkInDateStartFind"
                                asp-route-checkInDateEndFind="@checkInDateEndFind"
                                asp-route-checkOutDateStartFind="@checkOutDateStartFind"
@@ -93,9 +85,8 @@
                             </a>
                         </th>
                         <th class="element">
-                            <a asp-action="Index"
+                            <a asp-action="OurRentals"
                                asp-route-sortOrder="@(Model.SortViewModel.CheckOutDateSort)"
-                               asp-route-organizationNameFind="@organizationNameFind"
                                asp-route-checkInDateStartFind="@checkInDateStartFind"
                                asp-route-checkInDateEndFind="@checkInDateEndFind"
                                asp-route-checkOutDateStartFind="@checkOutDateStartFind"
@@ -103,7 +94,7 @@
                                 @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().Amount)
                             </a>
                         </th>
-                        <th class="element"></th>
+                        @* <th class="element"></th> *@
                     </tr>
                 </thead>
                 <tbody>
@@ -114,30 +105,29 @@
                                 @* @((await buildings.TryGet(item.Room.BuildingId)).Name),<br /> *@ @(item.Room.Building.Name) № @(item.Room.RoomNumber)
                             </td>
                             <td class="element">
-                                <a asp-controller="Organizations" asp-action="Details" asp-route-id="@item.RentalOrganizationId" >@Html.DisplayFor(modelItem => item.RentalOrganization.Name) </a>
+                                <a asp-controller="Organizations" asp-action="Details" asp-route-id="@item.RentalOrganizationId">@Html.DisplayFor(modelItem => item.RentalOrganization.Name) </a>
                             </td>
                             <td class="element">
                                 @Html.DisplayFor(modelItem => item.CheckInDate)
                             </td>
                             <td class="element">
                                 @Html.DisplayFor(modelItem => item.CheckOutDate)
-                            </td> 
+                            </td>
                             <td class="element">
                                 @Html.DisplayFor(modelItem => item.Amount)
-                            </td> 
+                            </td>@* 
                             <td class="element">
                                 <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.RentalId">Изменить</a> |
                                 <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.RentalId">Удалить</a>
-                            </td>
+                            </td> *@
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
 
-        <page-link page-model="Model.PageViewModel" page-action="Index"
+        <page-link page-model="Model.PageViewModel" page-action="OurRentals"
                    page-url-sortOrder="@(Model.SortViewModel.Current)"
-                   page-url-organizationNameFind="@organizationNameFind"
                    page-url-checkInDateStartFind="@checkInDateStartFind"
                    page-url-checkInDateEndFind="@checkInDateEndFind"
                    page-url-checkOutDateStartFind="@checkOutDateStartFind"

@@ -26,6 +26,11 @@ public partial class Rental
     [CheckDate("CheckInDate")]
     public DateTime CheckOutDate { get; set; }
 
+    [Required(ErrorMessage = "Не указана сумма оплаты")]
+    [Display(Name = "Сумма оплаты")]
+    [Range(0, double.MaxValue, ErrorMessage = "Значение не может быть меньше нуля")]
+    public decimal Amount { get; set; }
+
     [Display(Name = "Организация-арендатор")]
     [ValidateNever]
     public virtual Organization RentalOrganization { get; set; }

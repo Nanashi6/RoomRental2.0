@@ -1,0 +1,154 @@
+﻿@model RoomRental.ViewModels.InvoicesViewModel
+@inject RoomRental.Services.RoomService rooms
+@{
+    ViewData["Title"] = "OurInvoices";
+
+    decimal? amountFind = Model.FilterViewModel.AmountFind;
+    string personFind = Model.FilterViewModel.ResponsiblePersonFind;
+    DateTime? paymentDateFind = Model.FilterViewModel.PaymentDateFind;
+    DateTime? conclusionDateFind = Model.FilterViewModel.ConclusionDateFind;
+    DateTime? permissionDateFind = Model.FilterViewModel.PermissionDateFind;
+}
+
+<div class="index-container">
+    <div class="form-container">
+        <div class="tabs">
+            <h3>Фильтрация</h3>
+            <div><a asp-action="Create">Создать</a></div>
+        </div>
+        <div class="form-container_two">
+            <form method="get" asp-action="OurFilter">
+                <div class="form-div">
+                    <label class="white-label">Сумма</label>
+                    <input class="filter-input" type="text" step="any" name="AmountFind" value="@(amountFind)" oninput="this.value = this.value.replace(/[^0-9,]/g, '')" placeholder="Сумма" />
+                </div>
+                <div class="form-div">
+                    <label class="white-label">Ответственное лицо</label>
+                    <input class="filter-input" name="ResponsiblePersonFind" value="@personFind" placeholder="Ответственное лицо" />
+                </div>
+                <div class="form-div">
+                    <label class="white-label">Дата оформления</label>
+                    <input class="filter-input" type="date" name="ConclusionDateFind" value="@conclusionDateFind?.ToString("yyyy-MM-dd")" placeholder="Дата оформления" />
+                </div>
+                <div class="form-div">
+                    <label class="white-label">Дата платежа</label>
+                    <input class="filter-input" type="date" name="PaymentDateFind" value="@paymentDateFind?.ToString("yyyy-MM-dd")" placeholder="Дата платежа" />
+                </div>
+                <div class="form-div">
+                    <label class="white-label">Дата  для поиска должников</label>
+                    <input class="filter-input" type="date" name="PermissionDateFind" value="@permissionDateFind?.ToString("yyyy-MM-dd")" placeholder="Дата для поиска задолников" />
+                </div>
+                <input class="filter-input" type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
+                <input class="submitButton-index" type="submit" value="Поиск" />
+            </form>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h1>Счета-фактуры</h1>
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="element">
+                            @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().RoomId)
+                        </th>
+                        <th class="element">
+                            <a asp-action="OurInvoices"
+                               asp-route-sortOrder="@(Model.SortViewModel.OrganizationNameSort)"
+                               asp-route-amountFind="@amountFind"
+                               asp-route-personFind="@personFind"
+                               asp-route-paymentDateFind="@conclusionDateFind"
+                               asp-route-paymentDateFind="@permissionDateFind"
+                               asp-route-paymentDateFind="@paymentDateFind">
+                                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().RentalOrganization)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="OurInvoices"
+                               asp-route-sortOrder="@(Model.SortViewModel.AmountSort)"
+                               asp-route-amountFind="@amountFind"
+                               asp-route-personFind="@personFind"
+                               asp-route-paymentDateFind="@conclusionDateFind"
+                               asp-route-paymentDateFind="@permissionDateFind"
+                               asp-route-paymentDateFind="@paymentDateFind">
+                                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().Amount)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="OurInvoices"
+                               asp-route-sortOrder="@(Model.SortViewModel.ConclusionDateSort)"
+                               asp-route-amountFind="@amountFind"
+                               asp-route-personFind="@personFind"
+                               asp-route-paymentDateFind="@conclusionDateFind"
+                               asp-route-paymentDateFind="@permissionDateFind"
+                               asp-route-paymentDateFind="@paymentDateFind">
+                                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().ConclusionDate)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="OurInvoices"
+                               asp-route-sortOrder="@(Model.SortViewModel.PaymentDateSort)"
+                               asp-route-amountFind="@amountFind"
+                               asp-route-personFind="@personFind"
+                               asp-route-paymentDateFind="@conclusionDateFind"
+                               asp-route-paymentDateFind="@permissionDateFind"
+                               asp-route-paymentDateFind="@paymentDateFind">
+                                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().PaymentDate)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="OurInvoices"
+                               asp-route-sortOrder="@(Model.SortViewModel.ResponsiblePersonSort)"
+                               asp-route-amountFind="@amountFind"
+                               asp-route-personFind="@personFind"
+                               asp-route-paymentDateFind="@conclusionDateFind"
+                               asp-route-paymentDateFind="@permissionDateFind"
+                               asp-route-paymentDateFind="@paymentDateFind">
+                                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().ResponsiblePerson)
+                            </a>
+                        </th>
+                        @* <th class="element"></th> *@
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Invoices)
+                    {
+                        <tr class="row" onclick="location.href='@Url.Action("Details", "Invoices", new { id = item.InvoiceId })'">
+                            <td class="element">
+                                @((await rooms.TryGet(item.RoomId)).Building.Name),<br />  № @((await rooms.TryGet(item.RoomId)).RoomNumber)
+                            </td>
+                            <td class="element">
+                                <a asp-controller="Organizations" asp-action="Details" asp-route-id="@item.RentalOrganizationId">@Html.DisplayFor(modelItem => item.RentalOrganization.Name) </a>
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.Amount)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.ConclusionDate)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.PaymentDate)
+                            </td>
+                            <td class="element">
+                                @item.ResponsiblePerson.SNL
+                            </td>
+                            @* <td class="element">
+                                <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.InvoiceId">Изменить</a> |
+                                <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.InvoiceId">Удалить</a>
+                            </td> *@
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <page-link page-model="Model.PageViewModel" page-action="OurInvoices"
+                   page-url-sortOrder="@(Model.SortViewModel.Current)"
+                   page-url-amountFind="@amountFind"
+                   page-url-personFind="@personFind"
+                   page-url-paymentDateFind="@conclusionDateFind"
+                   page-url-paymentDateFind="@permissionDateFind"
+                   page-url-paymentDateFind="@paymentDateFind"></page-link>
+    </div>
+</div>

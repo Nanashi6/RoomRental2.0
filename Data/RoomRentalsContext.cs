@@ -131,6 +131,9 @@ public partial class RoomRentalsContext : IdentityDbContext<User>
             entity.HasIndex(e => e.RoomId, "IX_Rentals_roomId");
 
             entity.Property(e => e.RentalId).HasColumnName("rentalId");
+            entity.Property(e => e.Amount)
+                .HasColumnType("decimal(10, 2)")
+                .HasColumnName("amount");
             entity.Property(e => e.CheckInDate).HasColumnName("checkInDate");
             entity.Property(e => e.CheckOutDate).HasColumnName("checkOutDate");
             entity.Property(e => e.RentalOrganizationId).HasColumnName("rentalOrganizationId");

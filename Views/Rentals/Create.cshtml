@@ -29,6 +29,11 @@
                 <input class="filter-input" asp-for="CheckOutDate" class="form-control" />
                 <span asp-validation-for="CheckOutDate" class="text-danger"></span>
             </div>
+            <div class="form-div">
+                <label asp-for="Amount" class="control-label"></label>
+                <input class="filter-input" asp-for="Amount" class="form-control" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
             <div class="buttons">
                 <a class="submitButton-index btn-primary" asp-action="Index">Возврат к списку</a>
                 <input class="submitButton-index" type="submit" value="Создать" />

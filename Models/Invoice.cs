@@ -49,3 +49,5 @@ public partial class Invoice
     [ValidateNever]
     public virtual Room Room { get; set; } = null!;
 }
+
+// Ключ для аренд-счетов --- Помещение + организация + дата заключения договора

@@ -25,6 +25,10 @@
             <label>@Html.DisplayNameFor(model => model.Room):</label>
             @(Model.Room.Building.Name), № @(Model.Room.RoomNumber)
         </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Amount):</label>
+            @Html.DisplayFor(model => model.Amount)
+        </div>
     </div>
     <div class="det-container">
         <form asp-action="Delete">

@@ -44,7 +44,8 @@
         </div>
     </div>
     <div class="chart-table-container">
-        <form method="get">
+        <form method="get" asp-action="SetRentedDates">
+            <input type="hidden" name="id" value=@Model.BuildingId />
             <div class="form-div">
                 <label>Дата начала промежутка</label>
                 <input class="filter-input" type="date" name="startDate" id="startDate" value=@(ViewBag.StartDate.ToString("yyyy-MM-dd")) />

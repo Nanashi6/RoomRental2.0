@@ -12,6 +12,7 @@ using RoomRental.ViewModels.SortViewModels;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 
 namespace RoomRental.Controllers
 {
@@ -24,8 +25,10 @@ namespace RoomRental.Controllers
         private readonly RentalService _rentalCache;
         private readonly int _pageSize = 10;
         private readonly IWebHostEnvironment _appEnvironment;
+
         private readonly bool _isAdmin;
         private readonly int _organizationId;
+        private readonly string _userId;
 
         public BuildingsController(BuildingService cache, OrganizationService organizationCache, RoomService roomCache, RentalService rentalCache,
             IWebHostEnvironment appEnvironment, IConfiguration appConfig, HttpContextAccessor httpContext, UserManager<User> userManager)
@@ -38,6 +41,7 @@ namespace RoomRental.Controllers
             _pageSize = int.Parse(appConfig["Parameters:PageSize"]);
             _isAdmin = httpContext.HttpContext.User.IsInRole("Admin");
             _organizationId = userManager.GetUserAsync(httpContext.HttpContext.User).Result.OrganizationId;
+            _userId = userManager.GetUserAsync(httpContext.HttpContext.User).Result.Id;
         }
 
         // GET: Buildings
@@ -130,10 +134,9 @@ namespace RoomRental.Controllers
         }
 
         // GET: Buildings/Details/5
-        /*[SetSession("BuildingDetails")]*/
         public async Task<IActionResult> Details(int? id, DateTime? startDate = null, DateTime? endDate = null)
         {
-            /*if (HttpContext.Request.Method == "GET")
+            if (HttpContext.Request.Method == "GET")
             {
                 var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "BuildingDetails");
 
@@ -150,7 +153,7 @@ namespace RoomRental.Controllers
                     else
                         endDate = null;
                 }
-            }*/
+            }
 
             if (id == null || await _cache.GetAll() == null)
             {
@@ -214,6 +217,18 @@ namespace RoomRental.Controllers
             ViewBag.Area = buildingArea;
 
             return View(building);
+        }
+        [SetSession("BuildingDetails")]
+        public async Task<IActionResult> SetRentedDates(int? id, DateTime? startDate = null, DateTime? endDate = null)
+        {
+            var routeValues = new RouteValueDictionary
+            {
+                { "startDate", startDate },
+                { "endDate", endDate },
+                { "id", id }
+            };
+
+            return RedirectToAction(nameof(Details), routeValues);
         }
 
         // GET: Buildings/GetRentedRooms

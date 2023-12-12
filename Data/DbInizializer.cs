@@ -84,8 +84,8 @@ namespace RoomRental.Data
                 {
                     int rentalOrgId = rnd.Next(organizations.Count()) + 1;
                     DateTime checkInDate = GenerateRandomDate();
-                    DateTime checkOutDate = GenerateRandomDate(checkInDate, checkInDate.AddMonths(1));
-                    DateTime paymentDate = GenerateRandomDate(checkInDate, checkInDate.AddDays(7));
+                    DateTime checkOutDate = checkInDate.AddMonths(1);
+                    DateTime paymentDate = GenerateRandomDate(checkInDate, checkOutDate);
 
                     int roomId = rnd.Next(rooms.Count() + 1);
                     var room = rooms[roomId];
@@ -96,12 +96,15 @@ namespace RoomRental.Data
 
                     var person = context.Users.Single(e => e.OrganizationId == organization.OrganizationId);
 
+                    decimal amount = room.Area * 3;
+
                     context.Add(new Rental() 
                     { 
                         RoomId = room.RoomId, 
                         RentalOrganizationId = rentalOrgId, 
                         CheckInDate = checkInDate, 
-                        CheckOutDate = checkOutDate, 
+                        CheckOutDate = checkOutDate,
+                        Amount = amount,
                         Room = room, 
                         RentalOrganization = organizations[rentalOrgId-1] 
                     });
@@ -110,9 +113,9 @@ namespace RoomRental.Data
                         RoomId = room.RoomId,
                         RentalOrganizationId = rentalOrgId, 
                         ConclusionDate = checkInDate, 
-                        Amount = room.Area * (decimal)3.15, 
                         ResponsiblePersonId = person.Id, 
-                        PaymentDate = paymentDate, 
+                        PaymentDate = paymentDate,
+                        Amount = GetModifiedAmount(amount),
                         Room = room,
                         RentalOrganization = organizations[rentalOrgId - 1], 
                         ResponsiblePerson = person
@@ -132,6 +135,23 @@ namespace RoomRental.Data
             DateTime randomDate = startDate + randomSpan;
 
             return randomDate;
+        }
+        public static decimal GetModifiedAmount(decimal amount)
+        {
+            Random random = new Random();
+            int randomNumber = random.Next(1, 101); // Генерируем случайное число от 1 до 100
+
+            if (randomNumber <= 75)
+            {
+                // 75% случаев: возвращаем исходное значение amount
+                return amount;
+            }
+            else
+            {
+                // 25% случаев: возвращаем значение, меньшее, чем amount
+                decimal modifiedAmount = amount * 0.75m; // Пример: 75% от исходного значения
+                return modifiedAmount;
+            }
         }
     }
 }

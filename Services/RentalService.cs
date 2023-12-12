@@ -63,6 +63,7 @@ namespace RoomRental.Services
                         CheckInDate = i.CheckInDate,
                         CheckOutDate = i.CheckOutDate,
                         RentalOrganizationId = i.RentalOrganizationId,
+                        Amount = i.Amount,
                         RentalOrganization = new Organization()
                         {
                             OrganizationId = i.RentalOrganizationId,
@@ -92,6 +93,7 @@ namespace RoomRental.Services
                         CheckInDate = i.CheckInDate,
                         CheckOutDate = i.CheckOutDate,
                         RentalOrganizationId = i.RentalOrganizationId,
+                        Amount = i.Amount,
                         RentalOrganization = new Organization
                         {
                             OrganizationId = i.RentalOrganizationId,
