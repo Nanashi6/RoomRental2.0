@@ -35,6 +35,8 @@ namespace RoomRental.Services
             await _context.SaveChangesAsync();
             await UpdateCache();
 
+            _cache.Remove("RoomImages");
+
             return entRoom.Entity.RoomId;
         }
 

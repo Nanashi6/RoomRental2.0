@@ -135,6 +135,7 @@ namespace RoomRental.Controllers
                 int? roomId = await _cache.Add(room);
 
                 string[] paths = new string[room.Photos.Count()];
+                Console.WriteLine(paths.Length);
                 for (int i = 0; i < paths.Length; i++)
                 {
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(room.Photos[i].FileName);
