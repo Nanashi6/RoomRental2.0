@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using RoomRental.Data;
 using RoomRental.Models;
 using RoomRental.Services;
@@ -23,8 +24,15 @@ namespace RoomRental.Controllers
             _organizationCache = organizationCache;
         }
 
-        public IActionResult Index() => View(_userManager.Users.ToList());
+        public async Task<IActionResult> Index()
+        {
+            var AdminUsers = await _userManager.GetUsersInRoleAsync("Admin");
+            var allUsers = await _userManager.Users.ToListAsync();
 
+            var result = allUsers.Except(AdminUsers).ToList();
+
+            return View(result);
+        }
         public async Task<IActionResult> Create() 
         {
             ViewData["OrganizationId"] = new SelectList((await _organizationCache.GetAll()), "OrganizationId", "Name");

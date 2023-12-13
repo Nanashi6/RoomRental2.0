@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using RoomRental.Data;
 using RoomRental.ErrorDescribers;
 using RoomRental.Models;
@@ -22,7 +23,7 @@ namespace RoomRental
         public void ConfigureServices(IServiceCollection services)
         {
             string connection = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<RoomRentalsContext>(options => options.UseSqlServer(connection), ServiceLifetime.Scoped);
+            services.AddDbContext<RoomRentalsContext>(options => { options.UseSqlServer(connection); options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking); }, ServiceLifetime.Scoped);
 
             //Добавление классов авторизации
             services.AddIdentity<User, IdentityRole>(opts =>
@@ -40,6 +41,9 @@ namespace RoomRental
 
             services.AddScoped<HttpContextAccessor>();
 
+            // добавление кэширования
+            services.AddMemoryCache();
+
             // внедрение зависимости CachedService
             services.AddScoped<OrganizationService>();
             services.AddScoped<BuildingService>();
@@ -47,10 +51,6 @@ namespace RoomRental
             services.AddScoped<RoomImageService>();
             services.AddScoped<RentalService>();
             services.AddScoped<InvoiceService>();
-/*            services.AddScoped<PeopleService>();*/
-
-            // добавление кэширования
-            services.AddMemoryCache();
 
             //Добавление сессий
             services.AddDistributedMemoryCache();

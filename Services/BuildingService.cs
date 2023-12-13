@@ -11,7 +11,7 @@ namespace RoomRental.Services
         private readonly UserManager<User> _userManager;
         private readonly HttpContextAccessor _httpContext;
         public BuildingService(RoomRentalsContext context, IMemoryCache memoryCache, UserManager<User> userManager, HttpContextAccessor httpContext)
-            : base(memoryCache, context, "Buildings" + (httpContext.HttpContext.User.IsInRole("Admin") ? "" : userManager.GetUserAsync(httpContext.HttpContext.User).Result.OrganizationId)) 
+            : base(memoryCache, context, "Buildings" + (httpContext.HttpContext.User.IsInRole("Admin") ? "" : userManager.GetUserAsync(httpContext.HttpContext.User).Result.OrganizationId), userManager.GetUserAsync(httpContext.HttpContext.User).Result) 
         { 
             _userManager = userManager;
             _httpContext = httpContext;
@@ -27,13 +27,7 @@ namespace RoomRental.Services
 
         public async Task<Building> TryGet(int? id)
         {
-            if (!_cache.TryGetValue("Building" + id, out Building building))
-            {
-                building = _context.Buildings.Single(r => r.BuildingId == id);
-                _cache.Set("Building" + id, building, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
-            }
-
-            return building;
+            return _context.Buildings.Single(r => r.BuildingId == id);
         }
         /// <summary>
         /// Удаляет объект Building
@@ -65,13 +59,20 @@ namespace RoomRental.Services
             }
             await _context.SaveChangesAsync();
 
+            _cache.Remove("Rooms" + _user.OrganizationId);
+            _cache.Remove("Rooms");
+            _cache.Remove("Rentals" + _user.OrganizationId);
+            _cache.Remove("Rentals");
+            _cache.Remove("Invoices" + _user.OrganizationId);
+            _cache.Remove("Invoices");
+
             await UpdateCache();
         }
         /// <summary>
         /// Обновляет кэш
         /// </summary>
         /// <returns></returns>
-        protected override async Task<List<Building>> UpdateCache()
+        public override async Task<List<Building>> UpdateCache()
         {
             List<Building> buildings = null;
             if (_httpContext.HttpContext.User.IsInRole("Admin"))
@@ -93,6 +94,11 @@ namespace RoomRental.Services
                 _cache.Set(_name, buildings, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return buildings.ToList();
+        }
+
+        public async Task RemoveCache()
+        {
+            _cache.Remove(_name);
         }
     }
 }

@@ -7,6 +7,8 @@
         CheckInDateAsc,
         CheckInDateDesc,
         CheckOutDateAsc,
-        CheckOutDateDesc
+        CheckOutDateDesc,
+        AmountAsc,
+        AmountDesc
     }
 }

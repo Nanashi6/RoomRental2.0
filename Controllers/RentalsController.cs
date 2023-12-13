@@ -42,7 +42,7 @@ namespace RoomRental.Controllers
         {
             var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Rental");
 
-            if (dict != null)
+            /*if (dict != null)
             {
                 filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
 
@@ -71,7 +71,7 @@ namespace RoomRental.Controllers
                     filterViewModel.CheckOutDateEndFind = data;
                 else
                     filterViewModel.CheckOutDateEndFind = null;
-            }
+            }*/
 
             List<Rental> rentals = null;
             if (_httpContext.User.IsInRole("Admin"))
@@ -79,7 +79,9 @@ namespace RoomRental.Controllers
             else
                 rentals = (await _cache.GetAll()).Where(e => e.RentalOrganizationId != _userManager.GetUserAsync(_httpContext.User).Result.OrganizationId).ToList();
 
-            //Фильтрация
+            rentals = await SortSearch(rentals, dict, filterViewModel, sortOrder);
+
+            /*//Фильтрация
             if (!String.IsNullOrEmpty(filterViewModel.OrganizationNameFind))
                 rentals = rentals.Where(e => e.RentalOrganization.Name.Contains(filterViewModel.OrganizationNameFind)).ToList();
             if (filterViewModel.BuildingIdFind != null && filterViewModel.BuildingIdFind != 0)
@@ -123,7 +125,7 @@ namespace RoomRental.Controllers
                 default:
                     rentals = rentals.OrderByDescending(e => e.CheckOutDate).ToList();
                     break;
-            }
+            }*/
 
             //Разбиение на страницы
             int count = rentals.Count();
@@ -166,7 +168,7 @@ namespace RoomRental.Controllers
         {
             var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "OurRental");
 
-            if (dict != null)
+            /*if (dict != null)
             {
                 if (dict.ContainsKey("BuildingIdFind") && Int32.TryParse(dict["BuildingIdFind"], out int id))
                     filterViewModel.BuildingIdFind = id;
@@ -193,11 +195,13 @@ namespace RoomRental.Controllers
                     filterViewModel.CheckOutDateEndFind = data;
                 else
                     filterViewModel.CheckOutDateEndFind = null;
-            }
+            }*/
 
             var rentals = (await _cache.GetAll()).Where(e => e.RentalOrganizationId == _userManager.GetUserAsync(_httpContext.User).Result.OrganizationId).ToList();
 
-            //Фильтрация
+            rentals = await SortSearch(rentals, dict, filterViewModel, sortOrder);
+
+            /*//Фильтрация
             if (!String.IsNullOrEmpty(filterViewModel.OrganizationNameFind))
                 rentals = rentals.Where(e => e.RentalOrganization.Name.Contains(filterViewModel.OrganizationNameFind)).ToList();
             if (filterViewModel.BuildingIdFind != null && filterViewModel.BuildingIdFind != 0)
@@ -241,7 +245,7 @@ namespace RoomRental.Controllers
                 default:
                     rentals = rentals.OrderByDescending(e => e.CheckOutDate).ToList();
                     break;
-            }
+            }*/
 
             //Разбиение на страницы
             int count = rentals.Count();
@@ -299,7 +303,11 @@ namespace RoomRental.Controllers
         // GET: Rentals/Create
         public async Task<IActionResult> Create()
         {
-            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name");
+            List<Organization> organizations = await _organizationCache.GetAll();
+            if (!_httpContext.User.IsInRole("Admin"))
+                organizations = (await _organizationCache.GetAll()).Where(e => e.OrganizationId != (_userManager.GetUserAsync(_httpContext.User).Result).OrganizationId).ToList();
+
+            ViewData["RentalOrganizationId"] = new SelectList(organizations, "OrganizationId", "Name");
             var rooms = (await _roomCache.GetAll()).Select(e => new { RoomId = e.RoomId, Name = $"{e.Building.Name}, №{e.RoomNumber}" });
             ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Name");
             return View();
@@ -315,7 +323,11 @@ namespace RoomRental.Controllers
                 await _cache.Add(rental);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", rental.RentalOrganizationId);
+            List<Organization> organizations = await _organizationCache.GetAll();
+            if (!_httpContext.User.IsInRole("Admin"))
+                organizations = (await _organizationCache.GetAll()).Where(e => e.OrganizationId != (_userManager.GetUserAsync(_httpContext.User).Result).OrganizationId).ToList();
+
+            ViewData["RentalOrganizationId"] = new SelectList(organizations, "OrganizationId", "Name", rental.RentalOrganizationId);
             var rooms = (await _roomCache.GetAll()).Select(e => new { RoomId = e.RoomId, Name = $"{e.Building.Name}, №{e.RoomNumber}" });
             ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Name", rental.RoomId);
             return View(rental);
@@ -334,9 +346,15 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
-            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", rental.RentalOrganizationId);
-            var rooms = (await _roomCache.GetAll()).Select(e => new { RoomId = e.RoomId, Name = $"{e.Building.Name}, №{e.RoomNumber}" });
-            ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Name");
+            List<Organization> organizations = await _organizationCache.GetAll();
+            if (!_httpContext.User.IsInRole("Admin"))
+                organizations = (await _organizationCache.GetAll()).Where(e => e.OrganizationId != (_userManager.GetUserAsync(_httpContext.User).Result).OrganizationId).ToList();
+
+            ViewData["RentalOrganizationId"] = new SelectList(organizations, "OrganizationId", "Name", rental.RentalOrganizationId);
+
+            var rooms = (await _roomCache.GetAll()).Select(e => new { RoomId = e.RoomId, Info = e.Building.Name + ", №" + e.RoomNumber }).ToList();
+            ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Info", rental.RoomId);
+            Console.WriteLine(rental.RoomId);
             return View(rental);
         }
 
@@ -369,9 +387,14 @@ namespace RoomRental.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", rental.RentalOrganizationId);
-            var rooms = (await _roomCache.GetAll()).Select(e => new { RoomId = e.RoomId, Name = $"{e.Building.Name}, №{e.RoomNumber}" });
-            ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Name", rental.RoomId);
+            List<Organization> organizations = await _organizationCache.GetAll();
+            if (!_httpContext.User.IsInRole("Admin"))
+                organizations = (await _organizationCache.GetAll()).Where(e => e.OrganizationId != (_userManager.GetUserAsync(_httpContext.User).Result).OrganizationId).ToList();
+
+            ViewData["RentalOrganizationId"] = new SelectList(organizations, "OrganizationId", "Name", rental.RentalOrganizationId);
+            var rooms = (await _roomCache.GetAll()).Select(e => new { RoomId = e.RoomId, Info = e.Building.Name + ", №" + e.RoomNumber }).ToList();
+
+            ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Info", rental.RoomId);
             return View(rental);
         }
 
@@ -408,6 +431,94 @@ namespace RoomRental.Controllers
         private async Task<bool> RentalExistsAsync(int id)
         {
             return ((await _cache.GetAll())?.Any(e => e.RentalId == id)).GetValueOrDefault();
+        }
+
+        private async Task<List<Rental>> SortSearch(List<Rental> rentals, Dictionary<string, string> dict, RentalFilterViewModel filterViewModel, RentalSortState sortOrder = RentalSortState.OrganizationNameAsc)
+        {
+            if (dict != null)
+            {
+                filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
+
+                if (dict.ContainsKey("BuildingIdFind") && Int32.TryParse(dict["BuildingIdFind"], out int id))
+                    filterViewModel.BuildingIdFind = id;
+                else
+                    filterViewModel.BuildingIdFind = null;
+
+                DateTime data;
+                if (dict.ContainsKey("CheckInDateStartFind") && DateTime.TryParse(dict["CheckInDateStartFind"], out data))
+                    filterViewModel.CheckInDateStartFind = data;
+                else
+                    filterViewModel.CheckInDateStartFind = null;
+
+                if (dict.ContainsKey("CheckInDateEndFind") && DateTime.TryParse(dict["CheckInDateEndFind"], out data))
+                    filterViewModel.CheckInDateEndFind = data;
+                else
+                    filterViewModel.CheckInDateEndFind = null;
+
+                if (dict.ContainsKey("CheckOutDateStartFind") && DateTime.TryParse(dict["CheckOutDateStartFind"], out data))
+                    filterViewModel.CheckOutDateStartFind = data;
+                else
+                    filterViewModel.CheckOutDateStartFind = null;
+
+                if (dict.ContainsKey("CheckOutDateEndFind") && DateTime.TryParse(dict["CheckOutDateEndFind"], out data))
+                    filterViewModel.CheckOutDateEndFind = data;
+                else
+                    filterViewModel.CheckOutDateEndFind = null;
+            }
+
+            //Фильтрация
+            if (!String.IsNullOrEmpty(filterViewModel.OrganizationNameFind))
+                rentals = rentals.Where(e => e.RentalOrganization.Name.Contains(filterViewModel.OrganizationNameFind)).ToList();
+            if (filterViewModel.BuildingIdFind != null && filterViewModel.BuildingIdFind != 0)
+                rentals = rentals.Where(e => e.Room.BuildingId == filterViewModel.BuildingIdFind).ToList();
+
+            if (filterViewModel.CheckInDateStartFind != null && filterViewModel.CheckOutDateEndFind != null)
+                rentals = rentals.Where(e => (e.CheckOutDate >= filterViewModel.CheckInDateStartFind && e.CheckOutDate <= filterViewModel.CheckOutDateEndFind) || (e.CheckInDate <= filterViewModel.CheckOutDateEndFind && e.CheckInDate >= filterViewModel.CheckInDateStartFind) || (e.CheckInDate <= filterViewModel.CheckInDateStartFind && e.CheckOutDate >= filterViewModel.CheckOutDateEndFind)).ToList();
+            else if (filterViewModel.CheckInDateStartFind != null)
+                rentals = rentals.Where(e => e.CheckInDate >= filterViewModel.CheckInDateStartFind).ToList();
+            else if (filterViewModel.CheckOutDateEndFind != null)
+                rentals = rentals.Where(e => e.CheckOutDate <= filterViewModel.CheckOutDateEndFind).ToList();
+
+            if (filterViewModel.CheckInDateStartFind != null && filterViewModel.CheckInDateEndFind != null)
+                rentals = rentals.Where(e => e.CheckInDate <= filterViewModel.CheckInDateEndFind && e.CheckInDate >= filterViewModel.CheckInDateStartFind).ToList();
+            else if (filterViewModel.CheckInDateEndFind != null)
+                rentals = rentals.Where(e => e.CheckInDate <= filterViewModel.CheckInDateEndFind).ToList();
+
+            if (filterViewModel.CheckOutDateStartFind != null && filterViewModel.CheckOutDateEndFind != null)
+                rentals = rentals.Where(e => e.CheckOutDate >= filterViewModel.CheckOutDateStartFind && e.CheckOutDate <= filterViewModel.CheckOutDateEndFind).ToList();
+            else if (filterViewModel.CheckOutDateStartFind != null)
+                rentals = rentals.Where(e => e.CheckOutDate >= filterViewModel.CheckOutDateStartFind).ToList();
+
+            //Сортировка
+            switch (sortOrder)
+            {
+                case RentalSortState.OrganizationNameAsc:
+                    rentals = rentals.OrderBy(e => e.RentalOrganization.Name).ToList();
+                    break;
+                case RentalSortState.OrganizationNameDesc:
+                    rentals = rentals.OrderByDescending(e => e.RentalOrganization.Name).ToList();
+                    break;
+                case RentalSortState.CheckInDateAsc:
+                    rentals = rentals.OrderBy(e => e.CheckInDate).ToList();
+                    break;
+                case RentalSortState.CheckInDateDesc:
+                    rentals = rentals.OrderByDescending(e => e.CheckInDate).ToList();
+                    break;
+                case RentalSortState.CheckOutDateAsc:
+                    rentals = rentals.OrderBy(e => e.CheckOutDate).ToList();
+                    break;
+                case RentalSortState.AmountAsc:
+                    rentals = rentals.OrderBy(e => e.Amount).ToList();
+                    break;
+                case RentalSortState.AmountDesc:
+                    rentals = rentals.OrderByDescending(e => e.Amount).ToList();
+                    break;
+                default:
+                    rentals = rentals.OrderByDescending(e => e.CheckOutDate).ToList();
+                    break;
+            }
+
+            return rentals;
         }
     }
 }

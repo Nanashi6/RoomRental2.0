@@ -12,7 +12,7 @@ namespace RoomRental.Services
         private readonly int _organizationId;
         private readonly bool _isAdmin;
         public InvoiceService(RoomRentalsContext context, IMemoryCache memoryCache, UserManager<User> userManager, HttpContextAccessor httpContext, RoomService roomService)
-            : base(memoryCache, context, "Invoices" + (httpContext.HttpContext.User.IsInRole("Admin") ? "" : userManager.GetUserAsync(httpContext.HttpContext.User).Result.OrganizationId))
+            : base(memoryCache, context, "Invoices" + (httpContext.HttpContext.User.IsInRole("Admin") ? "" : userManager.GetUserAsync(httpContext.HttpContext.User).Result.OrganizationId), userManager.GetUserAsync(httpContext.HttpContext.User).Result)
         {
             _roomService = roomService;
             _organizationId = userManager.GetUserAsync(httpContext.HttpContext.User).Result.OrganizationId;
@@ -37,7 +37,6 @@ namespace RoomRental.Services
         {
             _context.Update(invoice);
             await _context.SaveChangesAsync();
-            _cache.Remove("Invoices" + invoice.RentalOrganizationId); ////////////////////////////////////////////////////////////////////
             await UpdateCache();
         }
         /// <summary>
@@ -46,66 +45,35 @@ namespace RoomRental.Services
         /// <returns></returns>
         public override async Task Delete(Invoice invoice)
         {
+            invoice.ResponsiblePerson = null;
+            _context.Entry(invoice).State = EntityState.Modified;
             if (invoice != null)
             {
                 _context.Invoices.Remove(invoice);
             }
 
             await _context.SaveChangesAsync();
-            _cache.Remove("Invoices" + invoice.RentalOrganizationId); ////////////////////////////////////////////////////////////////////
+            _cache.Remove("Rentals" + _user.OrganizationId);
+            _cache.Remove("Rentals");
             await UpdateCache();
         }
         /// <summary>
         /// Обновляет кэш
         /// </summary>
         /// <returns></returns>
-        protected override async Task<List<Invoice>> UpdateCache()
+        public override async Task<List<Invoice>> UpdateCache()
         {
             List<Invoice> invoices = null;
             if (_isAdmin)
                 invoices = await _context.Invoices
-                    .Select(i => new Invoice()
-                    {
-                        InvoiceId = i.InvoiceId,
-                        Amount = i.Amount,
-                        ConclusionDate = i.ConclusionDate,
-                        PaymentDate = i.PaymentDate,
-                        RentalOrganizationId = i.RentalOrganizationId,
-                        RoomId = i.RoomId,
-                        RentalOrganization = new Organization()
-                        {
-                            Name = i.RentalOrganization.Name,
-                        },
-                        ResponsiblePerson = new User()
-                        {
-                            Surname = i.ResponsiblePerson.Surname,
-                            Name = i.ResponsiblePerson.Name,
-                            Lastname = i.ResponsiblePerson.Lastname
-                        }
-                    })
+                    .Include(e => e.RentalOrganization)
+                    .Include(e => e.ResponsiblePerson)
                     .ToListAsync();
             else
                 invoices = await _context.Invoices
                     .Where(r => _roomService.GetAll().Result.Select(e => e.RoomId).Contains(r.RoomId) || r.RentalOrganizationId == _organizationId)
-                    .Select(i => new Invoice()
-                    {
-                        InvoiceId = i.InvoiceId,
-                        Amount = i.Amount,
-                        ConclusionDate = i.ConclusionDate,
-                        PaymentDate = i.PaymentDate,
-                        RentalOrganizationId = i.RentalOrganizationId,
-                        RoomId = i.RoomId,
-                        RentalOrganization = new Organization()
-                        {
-                            Name = i.RentalOrganization.Name,
-                        },
-                        ResponsiblePerson = new User()
-                        {
-                            Surname = i.ResponsiblePerson.Surname,
-                            Name = i.ResponsiblePerson.Name,
-                            Lastname = i.ResponsiblePerson.Lastname
-                        }
-                    })
+                    .Include(e => e.RentalOrganization)
+                    .Include(e => e.ResponsiblePerson)
                     .ToListAsync();
 
             if (invoices != null)
@@ -114,6 +82,11 @@ namespace RoomRental.Services
                 _cache.Set(_name, invoices, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return invoices;
+        }
+
+        public async Task RemoveCache()
+        {
+            _cache.Remove(_name);
         }
     }
 }

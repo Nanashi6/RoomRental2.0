@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using RoomRental.Data;
 using RoomRental.Models;
@@ -7,10 +8,10 @@ namespace RoomRental.Services
 {
     public class OrganizationService : CachedService<Organization>
     {
-        public OrganizationService(RoomRentalsContext context, IMemoryCache memoryCache) : base(memoryCache, context, "Organizations")
+        public OrganizationService(RoomRentalsContext context, IMemoryCache memoryCache, UserManager<User> userManager, HttpContextAccessor httpContext) : base(memoryCache, context, "Organizations", userManager.GetUserAsync(httpContext.HttpContext.User).Result)
         {
-
         }
+
         public async override Task<Organization> Get(int? id)
         {
             return (await GetAll()).Single(e => e.OrganizationId == id);
@@ -48,10 +49,19 @@ namespace RoomRental.Services
             }
             await _context.SaveChangesAsync();
 
+            _cache.Remove("Buildings" + _user.OrganizationId);
+            _cache.Remove("Buildings");
+            _cache.Remove("Rooms" + _user.OrganizationId);
+            _cache.Remove("Rooms");
+            _cache.Remove("Rentals" + _user.OrganizationId);
+            _cache.Remove("Rentals");
+            _cache.Remove("Invoices" + _user.OrganizationId);
+            _cache.Remove("Invoices");
+
             await UpdateCache();
         }
 
-        protected async override Task<List<Organization>> UpdateCache()
+        public async override Task<List<Organization>> UpdateCache()
         {
             var organizations = await _context.Organizations.ToListAsync();
             // если пользователь найден, то добавляем в кэш - время кэширования 5 минут

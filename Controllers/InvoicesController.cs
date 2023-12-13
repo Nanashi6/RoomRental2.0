@@ -43,7 +43,7 @@ namespace RoomRental.Controllers
         {
             var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Invoice");
 
-            if (dict != null)
+            /*if (dict != null)
             {
                 filterViewModel.ResponsiblePersonFind = dict["ResponsiblePersonFind"];
                 filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
@@ -69,7 +69,7 @@ namespace RoomRental.Controllers
                     filterViewModel.AmountFind = amountFind;
                 else
                     filterViewModel.AmountFind = null;
-            }
+            }*/
 
             List<Invoice> invoices = null;
             if (_httpContext.User.IsInRole("Admin"))
@@ -77,7 +77,9 @@ namespace RoomRental.Controllers
             else
                 invoices = (await _cache.GetAll()).Where(e => e.RentalOrganizationId != _userManager.GetUserAsync(_httpContext.User).Result.OrganizationId).ToList();
 
-            //Фильтрация
+            invoices = await SortSearch(invoices, dict, filterViewModel, sortOrder);
+
+            /*//Фильтрация
             if (!String.IsNullOrEmpty(filterViewModel.OrganizationNameFind))
                 invoices = invoices.Where(e => e.RentalOrganization.Name.Contains(filterViewModel.OrganizationNameFind)).ToList();
             if (!String.IsNullOrEmpty(filterViewModel.ResponsiblePersonFind))
@@ -95,7 +97,7 @@ namespace RoomRental.Controllers
             if (filterViewModel.PermissionDateFind != null)
                 invoices = invoices.Where(e => e.PaymentDate > filterViewModel.PermissionDateFind && e.ConclusionDate <= filterViewModel.PermissionDateFind
                 || (e.PaymentDate <= filterViewModel.PermissionDateFind
-                        && (_rentalCache.GetAll().Result).Single(r => r.CheckInDate == e.ConclusionDate && r.RentalOrganizationId == e.RentalOrganizationId && r.Room.RoomId == e.RoomId).Amount - 1 > e.Amount))
+                        && (_rentalCache.GetAll().Result).Single(r => r.CheckInDate == e.ConclusionDate && r.RentalOrganizationId == e.RentalOrganizationId && r.Room.RoomId == e.RoomId).Amount > e.Amount))
                     .ToList();
             /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -133,7 +135,7 @@ namespace RoomRental.Controllers
                 default:
                     invoices = invoices.OrderByDescending(e => e.ResponsiblePersonId).ToList();
                     break;
-            }
+            }*/
 
             //Разбиение на страницы
             int count = invoices.Count;
@@ -169,7 +171,7 @@ namespace RoomRental.Controllers
         {
             var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "OurInvoice");
 
-            if (dict != null)
+            /*if (dict != null)
             {
                 filterViewModel.ResponsiblePersonFind = dict["ResponsiblePersonFind"];
                 filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
@@ -195,11 +197,13 @@ namespace RoomRental.Controllers
                     filterViewModel.AmountFind = amountFind;
                 else
                     filterViewModel.AmountFind = null;
-            }
+            }*/
 
             var invoices = (await _cache.GetAll()).Where(e => e.RentalOrganizationId == _userManager.GetUserAsync(_httpContext.User).Result.OrganizationId).ToList();
 
-            //Фильтрация
+            invoices = await SortSearch(invoices, dict, filterViewModel, sortOrder);
+
+            /*//Фильтрация
             if (!String.IsNullOrEmpty(filterViewModel.ResponsiblePersonFind))
                 invoices = invoices.Where(e => e.ResponsiblePerson.SNL.Contains(filterViewModel.ResponsiblePersonFind)).ToList();
             if (filterViewModel.AmountFind != null)
@@ -244,7 +248,7 @@ namespace RoomRental.Controllers
                 default:
                     invoices = invoices.OrderByDescending(e => e.ResponsiblePersonId).ToList();
                     break;
-            }
+            }*/
 
             //Разбиение на страницы
             int count = invoices.Count;
@@ -296,7 +300,11 @@ namespace RoomRental.Controllers
         // GET: Invoices/Create
         public async Task<IActionResult> Create()
         {
-            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name");
+            List<Organization> organizations = await _organizationCache.GetAll();
+            if (!_httpContext.User.IsInRole("Admin"))
+                organizations = (await _organizationCache.GetAll()).Where(e => e.OrganizationId != (_userManager.GetUserAsync(_httpContext.User).Result).OrganizationId).ToList();
+
+            ViewData["RentalOrganizationId"] = new SelectList(organizations, "OrganizationId", "Name");
 
             List<User> people;
             if (_httpContext.User.IsInRole("Admin"))
@@ -316,13 +324,16 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("InvoiceId,RentalOrganizationId,RoomId,Amount,ConclusionDate,PaymentDate,ResponsiblePersonId")] Invoice invoice)
         {
-            Console.WriteLine(invoice.ResponsiblePersonId);
             if (ModelState.IsValid)
             {
                 await _cache.Add(invoice);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", invoice.RentalOrganizationId);
+            List<Organization> organizations = await _organizationCache.GetAll();
+            if (!_httpContext.User.IsInRole("Admin"))
+                organizations = (await _organizationCache.GetAll()).Where(e => e.OrganizationId != (_userManager.GetUserAsync(_httpContext.User).Result).OrganizationId).ToList();
+
+            ViewData["RentalOrganizationId"] = new SelectList(organizations, "OrganizationId", "Name", invoice.RentalOrganizationId);
 
             List<User> people;
             if (_httpContext.User.IsInRole("Admin"))
@@ -351,8 +362,11 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
-            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", invoice.RentalOrganizationId);
+            List<Organization> organizations = await _organizationCache.GetAll();
+            if (!_httpContext.User.IsInRole("Admin"))
+                organizations = (await _organizationCache.GetAll()).Where(e => e.OrganizationId != (_userManager.GetUserAsync(_httpContext.User).Result).OrganizationId).ToList()
 
+            ; ViewData["RentalOrganizationId"] = new SelectList(organizations, "OrganizationId", "Name", invoice.RentalOrganizationId);
             List<User> people;
             if (_httpContext.User.IsInRole("Admin"))
                 people = _userManager.Users.ToList();
@@ -396,8 +410,11 @@ namespace RoomRental.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", invoice.RentalOrganizationId);
+            List<Organization> organizations = await _organizationCache.GetAll();
+            if (!_httpContext.User.IsInRole("Admin"))
+                organizations = (await _organizationCache.GetAll()).Where(e => e.OrganizationId != (_userManager.GetUserAsync(_httpContext.User).Result).OrganizationId).ToList();
 
+             ViewData["RentalOrganizationId"] = new SelectList(organizations, "OrganizationId", "Name", invoice.RentalOrganizationId);
             List<User> people;
             if (_httpContext.User.IsInRole("Admin"))
                 people = _userManager.Users.ToList();
@@ -444,6 +461,97 @@ namespace RoomRental.Controllers
         private async Task<bool> InvoiceExists(int id)
         {
             return ((await _cache.GetAll())?.Any(e => e.InvoiceId == id)).GetValueOrDefault();
+        }
+
+        private async Task<List<Invoice>> SortSearch(List<Invoice> invoices, Dictionary<string, string> dict, InvoiceFilterViewModel filterViewModel, InvoiceSortState sortOrder = InvoiceSortState.OrganizationNameAsc)
+        {
+            if (dict != null)
+            {
+                filterViewModel.ResponsiblePersonFind = dict["ResponsiblePersonFind"];
+                filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
+
+                DateTime date;
+                if (dict.ContainsKey("PaymentDateFind") && DateTime.TryParse(dict["PaymentDateFind"], out date))
+                    filterViewModel.PaymentDateFind = date;
+                else
+                    filterViewModel.PaymentDateFind = null;
+
+                if (dict.ContainsKey("ConclusionDateFind") && DateTime.TryParse(dict["ConclusionDateFind"], out date))
+                    filterViewModel.ConclusionDateFind = date;
+                else
+                    filterViewModel.ConclusionDateFind = null;
+
+                if (dict.ContainsKey("PermissionDateFind") && DateTime.TryParse(dict["PermissionDateFind"], out date))
+                    filterViewModel.PermissionDateFind = date;
+                else
+                    filterViewModel.PermissionDateFind = null;
+
+                Decimal amountFind;
+                if (dict.ContainsKey("AmountFind") && Decimal.TryParse(dict["AmountFind"], out amountFind))
+                    filterViewModel.AmountFind = amountFind;
+                else
+                    filterViewModel.AmountFind = null;
+            }
+
+            //Фильтрация
+            if (!String.IsNullOrEmpty(filterViewModel.OrganizationNameFind))
+                invoices = invoices.Where(e => e.RentalOrganization.Name.Contains(filterViewModel.OrganizationNameFind)).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.ResponsiblePersonFind))
+                invoices = invoices.Where(e => e.ResponsiblePerson.SNL.Contains(filterViewModel.ResponsiblePersonFind)).ToList();
+            if (filterViewModel.AmountFind != null)
+                invoices = invoices.Where(e => e.Amount == filterViewModel.AmountFind).ToList();
+            if (filterViewModel.ConclusionDateFind != null)
+                invoices = invoices.Where(e => e.ConclusionDate == filterViewModel.ConclusionDateFind).ToList();
+            if (filterViewModel.PaymentDateFind != null)
+                invoices = invoices.Where(e => e.PaymentDate == filterViewModel.PaymentDateFind).ToList();
+
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /// Фильтрация должников
+            if (filterViewModel.PermissionDateFind != null)
+                invoices = invoices.Where(e => e.PaymentDate > filterViewModel.PermissionDateFind && e.ConclusionDate <= filterViewModel.PermissionDateFind
+                || (e.PaymentDate <= filterViewModel.PermissionDateFind
+                        && (_rentalCache.GetAll().Result).Single(r => r.CheckInDate == e.ConclusionDate && r.RentalOrganizationId == e.RentalOrganizationId && r.Room.RoomId == e.RoomId).Amount > e.Amount))
+                    .ToList();
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+            //Сортировка
+            switch (sortOrder)
+            {
+                case InvoiceSortState.OrganizationNameAsc:
+                    invoices = invoices.OrderBy(e => e.RentalOrganization.Name).ToList();
+                    break;
+                case InvoiceSortState.OrganizationNameDesc:
+                    invoices = invoices.OrderByDescending(e => e.RentalOrganization.Name).ToList();
+                    break;
+                case InvoiceSortState.PaymentDateAsc:
+                    invoices = invoices.OrderBy(e => e.PaymentDate).ToList();
+                    break;
+                case InvoiceSortState.PaymentDateDesc:
+                    invoices = invoices.OrderByDescending(e => e.PaymentDate).ToList();
+                    break;
+                case InvoiceSortState.ConclusionDateAsc:
+                    invoices = invoices.OrderBy(e => e.ConclusionDate).ToList();
+                    break;
+                case InvoiceSortState.ConclusionDateDesc:
+                    invoices = invoices.OrderByDescending(e => e.ConclusionDate).ToList();
+                    break;
+                case InvoiceSortState.AmountAsc:
+                    invoices = invoices.OrderBy(e => e.Amount).ToList();
+                    break;
+                case InvoiceSortState.AmountDesc:
+                    invoices = invoices.OrderByDescending(e => e.Amount).ToList();
+                    break;
+                case InvoiceSortState.ResponsiblePersonAsc:
+                    invoices = invoices.OrderBy(e => e.ResponsiblePersonId).ToList();
+                    break;
+                default:
+                    invoices = invoices.OrderByDescending(e => e.ResponsiblePersonId).ToList();
+                    break;
+            }
+
+            return invoices;
         }
     }
 }

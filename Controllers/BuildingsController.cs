@@ -193,21 +193,23 @@ namespace RoomRental.Controllers
             List<DateTime> days = new();
 
             List<DaysRentals> daysRentals = new();
-
-            DateTime currentDate = startDate.Value;
-            while (currentDate <= endDate.Value)
+            if(buildingArea != 0)
             {
-                //Подсчёт процента аренды здания на число currentDate
-                daysRentals.Add(new DaysRentals()
+                DateTime currentDate = startDate.Value;
+                while (currentDate <= endDate.Value)
                 {
-                    Date = DateOnly.FromDateTime(currentDate),
-                    Percentage = rooms
-                                    .Where(r => currentDate >= r.CheckInDate && r.CheckOutDate >= currentDate)
-                                    .Sum(r => r.Room.Area) * 100 / buildingArea
-                });
+                    //Подсчёт процента аренды здания на число currentDate
+                    daysRentals.Add(new DaysRentals()
+                    {
+                        Date = DateOnly.FromDateTime(currentDate),
+                        Percentage = rooms
+                                        .Where(r => currentDate >= r.CheckInDate && r.CheckOutDate >= currentDate)
+                                        .Sum(r => r.Room.Area) * 100 / buildingArea
+                    });
 
-                // Увеличение даты на один день
-                currentDate = currentDate.AddDays(1);
+                    // Увеличение даты на один день
+                    currentDate = currentDate.AddDays(1);
+                }
             }
 
             ViewBag.DaysRentals = daysRentals;

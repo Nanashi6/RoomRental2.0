@@ -23,10 +23,26 @@
     }
     else if (User.IsInRole("User"))
     {
-        <a asp-area="" asp-controller="Organizations" asp-action="Details" asp-route-id=@UserManager.GetUserAsync(User).Result?.OrganizationId>Организация</a>
-        <a asp-area="" asp-controller="Buildings" asp-action="Index">Здания</a>
-        <a asp-area="" asp-controller="Rooms" asp-action="Index">Помещения</a>
-        <a asp-area="" asp-controller="Rentals" asp-action="Index">Аренда</a>
-        <a asp-area="" asp-controller="Invoices" asp-action="Index">Счета</a>
+        <div class="dropdown">
+            <a asp-area="" asp-controller="Organizations" class="dropbtn" asp-action="Details" asp-route-id=@UserManager.GetUserAsync(User).Result?.OrganizationId>Организация</a>
+        </div>
+        <div class="dropdown">
+            <a asp-area="" asp-controller="Buildings" asp-action="Index" class="dropbtn">Здания</a>
+        </div>
+        <div class="dropdown">
+            <a asp-area="" asp-controller="Rooms" asp-action="Index" class="dropbtn">Помещения</a>
+        </div>
+        <div class="dropdown">
+            <a asp-area="" asp-controller="Rentals" asp-action="Index" class="dropbtn">Аренда</a>
+            <div class="dropdown-content">
+                <a asp-area="" asp-controller="Rentals" asp-action="OurRentals">Аренда</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a asp-area="" asp-controller="Invoices" asp-action="Index" class="dropbtn">Счета</a>
+            <div class="dropdown-content">
+                <a asp-area="" asp-controller="Invoices" asp-action="OurInvoices">Счета</a>
+            </div>
+        </div>
     }
 </div>

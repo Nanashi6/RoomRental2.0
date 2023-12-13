@@ -1,5 +1,5 @@
 ﻿@model RoomRental.ViewModels.RentalsViewModel
-
+@inject RoomRental.Services.RoomService rooms
 @{
     ViewData["Title"] = "Rentals";
 
@@ -86,7 +86,7 @@
                         </th>
                         <th class="element">
                             <a asp-action="OurRentals"
-                               asp-route-sortOrder="@(Model.SortViewModel.CheckOutDateSort)"
+                               asp-route-sortOrder="@(Model.SortViewModel.AmountSort)"
                                asp-route-checkInDateStartFind="@checkInDateStartFind"
                                asp-route-checkInDateEndFind="@checkInDateEndFind"
                                asp-route-checkOutDateStartFind="@checkOutDateStartFind"
@@ -102,7 +102,7 @@
                     {
                         <tr class="row" onclick="location.href='@Url.Action("Details", "Rentals", new { id = item.RentalId })'">
                             <td class="element">
-                                @* @((await buildings.TryGet(item.Room.BuildingId)).Name),<br /> *@ @(item.Room.Building.Name) № @(item.Room.RoomNumber)
+                                @((await rooms.TryGet(item.RoomId)).Building.Name),<br />  № @((await rooms.TryGet(item.RoomId)).RoomNumber)
                             </td>
                             <td class="element">
                                 <a asp-controller="Organizations" asp-action="Details" asp-route-id="@item.RentalOrganizationId">@Html.DisplayFor(modelItem => item.RentalOrganization.Name) </a>

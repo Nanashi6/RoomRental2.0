@@ -11,9 +11,9 @@ namespace RoomRental.Services
     {
         private readonly HttpContextAccessor _httpContext;
         private readonly BuildingService _buildingService;
-
-        public RoomService(RoomRentalsContext context, IMemoryCache memoryCache, UserManager<User> userManager, HttpContextAccessor httpContext, BuildingService buildingService)
-            : base(memoryCache, context, "Rooms" + (httpContext.HttpContext.User.IsInRole("Admin") ? "" : userManager.GetUserAsync(httpContext.HttpContext.User).Result.OrganizationId))
+        public RoomService(RoomRentalsContext context, IMemoryCache memoryCache, UserManager<User> userManager, HttpContextAccessor httpContext,
+            BuildingService buildingService)
+            : base(memoryCache, context, "Rooms" + (httpContext.HttpContext.User.IsInRole("Admin") ? "" : userManager.GetUserAsync(httpContext.HttpContext.User).Result.OrganizationId), userManager.GetUserAsync(httpContext.HttpContext.User).Result)
         { 
             _httpContext = httpContext;
             _buildingService = buildingService;
@@ -25,14 +25,8 @@ namespace RoomRental.Services
         }
 
         public async Task<Room> TryGet(int? id)
-        {
-            if (!_cache.TryGetValue("Room" + id, out Room room))
-            {
-                room = _context.Rooms.Where(r => r.RoomId == id).Include(e => e.Building).First();
-                _cache.Set("Room" + id, room, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
-            }
-                
-            return room;
+        {                
+            return _context.Rooms.Where(r => r.RoomId == id).Include(e => e.Building).First();
         }
 
         public override async Task<int?> Add(Room room)
@@ -65,10 +59,16 @@ namespace RoomRental.Services
             }
 
             await _context.SaveChangesAsync();
+
+            _cache.Remove("Rentals" + _user.OrganizationId);
+            _cache.Remove("Rentals");
+            _cache.Remove("Invoices" + _user.OrganizationId);
+            _cache.Remove("Invoices");
+
             await UpdateCache();
         }
 
-        protected async override Task<List<Room>> UpdateCache()
+        public async override Task<List<Room>> UpdateCache()
         {
             List<Room> rooms = null;
             if (_httpContext.HttpContext.User.IsInRole("Admin"))
@@ -89,6 +89,10 @@ namespace RoomRental.Services
                 _cache.Set(_name, rooms, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return rooms;
+        }
+        public async Task RemoveCache()
+        {
+            _cache.Remove(_name);
         }
     }
 }

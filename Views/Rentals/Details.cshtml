@@ -1,5 +1,6 @@
 ﻿@model RoomRental.Models.Rental
 @inject UserManager<User> userManager
+@inject RoomRental.Services.RoomService rooms
 
 @{
     ViewData["Title"] = "Details";
@@ -22,7 +23,7 @@
         </div>
         <div>
             <label>@Html.DisplayNameFor(model => model.Room):</label>
-            @(Model.Room.Building.Name), № @(Model.Room.RoomNumber)
+            @((await rooms.TryGet(Model.RoomId)).Building.Name) № @(Model.Room.RoomNumber)
         </div>
         <div>
             <label>@Html.DisplayNameFor(model => model.Amount):</label>

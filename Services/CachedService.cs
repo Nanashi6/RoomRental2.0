@@ -8,13 +8,15 @@ namespace RoomRental.Services
     public abstract class CachedService<T>
     {
         protected RoomRentalsContext _context;
-        protected IMemoryCache _cache;
+        protected static IMemoryCache _cache;
         protected string _name;
-        public CachedService(IMemoryCache cache, RoomRentalsContext context, string name)
+        protected readonly User _user;
+        public CachedService(IMemoryCache cache, RoomRentalsContext context, string name, User user)
         {
             _cache = cache;
             _context = context;
             _name = name;
+            _user = user;
         }
 
         public async virtual Task<List<T>> GetAll()
@@ -43,6 +45,6 @@ namespace RoomRental.Services
             await UpdateCache();
         }
         public abstract Task Delete(T entity);
-        protected abstract Task<List<T>> UpdateCache();
+        public abstract Task<List<T>> UpdateCache();
     }
 }

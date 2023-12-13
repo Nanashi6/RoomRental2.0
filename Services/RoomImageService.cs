@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using RoomRental.Data;
 using RoomRental.Models;
@@ -7,7 +9,7 @@ namespace RoomRental.Services
 {
     public class RoomImageService : CachedService<RoomImage>
     {
-        public RoomImageService(RoomRentalsContext context, IMemoryCache memoryCache) : base(memoryCache, context, "RoomImages") { }
+        public RoomImageService(RoomRentalsContext context, IMemoryCache memoryCache, UserManager<User> userManager, HttpContextAccessor httpContext) : base(memoryCache, context, "RoomImages", userManager.GetUserAsync(httpContext.HttpContext.User).Result) { }
 
         public async override Task<RoomImage> Get(int? id)
         {
@@ -37,7 +39,7 @@ namespace RoomRental.Services
             await UpdateCache();
         }
 
-        protected override async Task<List<RoomImage>> UpdateCache()
+        public override async Task<List<RoomImage>> UpdateCache()
         {
             var images = await _context.RoomImages.ToListAsync();
 

@@ -21,7 +21,7 @@ public partial class Invoice
     [Required(ErrorMessage = "Не указана сумма оплаты")]
     [Display(Name = "Сумма оплаты")]
     [Range(0, double.MaxValue, ErrorMessage = "Значение не может быть меньше нуля")]
-    public decimal Amount { get; set; }
+    public decimal? Amount { get; set; }
 
     [Required(ErrorMessage = "Не указана дата заключения договора")]
     [Display(Name = "Дата заключения договора")]
@@ -44,7 +44,7 @@ public partial class Invoice
 
     [Display(Name = "Оформляющий")]
     [ValidateNever]
-    public virtual User ResponsiblePerson { get; set; } = null!;
+    public virtual User? ResponsiblePerson { get; set; } = null!;
 
     [ValidateNever]
     public virtual Room Room { get; set; } = null!;
