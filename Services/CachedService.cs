@@ -49,8 +49,9 @@ namespace RoomRental.Services
         public abstract Task Delete(T entity);
         public abstract Task<List<T>> UpdateCache();
 
-        private void RefreshCache()
+        public void RefreshCache()
         {
+            _cache.Remove("RoomImages");
             _cache.Remove("Buildings" + _user.OrganizationId);
             _cache.Remove("Buildings");
             _cache.Remove("Rooms" + _user.OrganizationId);

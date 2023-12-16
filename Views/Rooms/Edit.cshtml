@@ -4,46 +4,85 @@
     ViewData["Title"] = "Edit";
 }
 
-<div class="container">
-    <h1>Изменение информации о помещении</h1>
+<div class="row-flexbox">
+    <div class="details-container">
+        <h1>Изменение информации о помещении</h1>
 
-    <div class="create-form-container">
-        <form asp-action="Edit" method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="det-container" style="margin: 0 5px 0 0;">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <input class="filter-input" type="hidden" asp-for="RoomId" />
-            <div class="form-div">
-                <label asp-for="BuildingId" class="control-label"></label>
-                <select class="filter-input" asp-for="BuildingId" class="form-control" asp-items="ViewBag.BuildingId"></select>
-            </div>
-            <div class="form-div">
-                <label asp-for="RoomNumber" class="control-label"></label>
-                <input class="filter-input" type="number" min="1" asp-for="RoomNumber" class="form-control" placeholder="Номер комнаты" />
-                <span asp-validation-for="RoomNumber" class="text-danger"></span>
-            </div>
-            <div class="form-div">
-                <label asp-for="Area" class="control-label"></label>
-                <input class="filter-input" asp-for="Area" class="form-control" placeholder="Площадь" />
-                <span asp-validation-for="Area" class="text-danger"></span>
-            </div>
-            <div class="form-div">
-                <label asp-for="Description" class="control-label"></label>
-                <input class="filter-input" asp-for="Description" class="form-control" placeholder="Описание" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-div">
-                <label asp-for="Photos" class="control-label"></label>
-                <input class="filter-input" type="file" asp-for="Photos" class="form-control" accept="image/*" multiple placeholder="Фото" />
-                <span asp-validation-for="Photos" class="text-danger"></span>
-            </div>
-            <div class="buttons">
-                <a class="btn-primary submitButton-index" asp-action="Index">Возврат к списку</a>
-                <input class="submitButton-index" type="submit" value="Изменить" />
-            </div>
-        </form>
+                <input class="filter-input" type="hidden" asp-for="RoomId" />
+                <div class="form-div">
+                    <label asp-for="BuildingId" class="control-label"></label>
+                    <select class="filter-input" asp-for="BuildingId" class="form-control" asp-items="ViewBag.BuildingId"></select>
+                </div>
+                <div class="form-div">
+                    <label asp-for="RoomNumber" class="control-label"></label>
+                    <input class="filter-input" type="number" min="1" asp-for="RoomNumber" class="form-control" placeholder="Номер комнаты" />
+                    <span asp-validation-for="RoomNumber" class="text-danger"></span>
+                </div>
+                <div class="form-div">
+                    <label asp-for="Area" class="control-label"></label>
+                    <input class="filter-input" asp-for="Area" class="form-control" placeholder="Площадь" />
+                    <span asp-validation-for="Area" class="text-danger"></span>
+                </div>
+                <div class="form-div">
+                    <label asp-for="Description" class="control-label"></label>
+                    <input class="filter-input" asp-for="Description" class="form-control" placeholder="Описание" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                @* <div class="form-div">
+                    <label asp-for="Photos" class="control-label"></label>
+                    <input class="filter-input" type="file" asp-for="Photos" class="form-control" accept="image/*" multiple placeholder="Фото" />
+                    <span asp-validation-for="Photos" class="text-danger"></span>
+                </div> *@
+                <div class="buttons">
+                    <a class="btn-primary submitButton-index" asp-action="Index">Возврат к списку</a>
+                    <input class="submitButton-index" type="submit" value="Изменить" />
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+    <div class="container">
+        <div>
+            <form asp-action="AddImage" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+                <input class="filter-input" type="hidden" asp-for="RoomId" />
+                <div class="form-div">
+                    <label asp-for="Photos" class="control-label"></label>
+                    <input class="filter-input" type="file" name="images" for="images" accept="image/*" multiple placeholder="Фото" />
+                </div>
+                <input class="submitButton-index" type="submit" value="Добавить" />
+            </form>
+        </div>
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="element">
+                            @Html.DisplayNameFor(model => model.RoomImages)
+                        </th>
+                        <th class="element"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.RoomImages)
+                    {
+                        <tr class="row">
+                            <td class="element">
+                                <img style="width: 400px; height: 300px;" src="@item.ImagePath" />
+                            </td>
+                            <td class="element">
+                                <a class="btn-danger btn" asp-action="DeleteImage" asp-route-imageId="@item.ImageId" asp-route-roomId="@Model.RoomId">Удалить</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+</div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

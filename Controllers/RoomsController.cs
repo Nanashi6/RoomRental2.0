@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using RoomRental.Attributes;
 using RoomRental.Models;
@@ -179,7 +180,7 @@ namespace RoomRental.Controllers
         // POST: Rooms/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("RoomId,BuildingId,RoomNumber,Area,Description,Photos")] Room room)
+        public async Task<IActionResult> Edit(int id, [Bind("RoomId,BuildingId,RoomNumber,Area,Description")] Room room)
         {
             if (id != room.RoomId)
             {
@@ -192,7 +193,7 @@ namespace RoomRental.Controllers
                 {
                     await _cache.Update(room);
 
-                    await _imageCache.DeleteImageForRoom(room.RoomId);
+                    /*await _imageCache.DeleteImageForRoom(room.RoomId);
                     string[] paths = new string[room.Photos.Count()];
                     for (int i = 0; i < paths.Length; i++)
                     {
@@ -208,7 +209,7 @@ namespace RoomRental.Controllers
                             ImagePath = Path.Combine("\\images\\Rooms\\", fileName),
                             RoomId = (int)room.RoomId
                         });
-                    }
+                    }*/
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -242,6 +243,41 @@ namespace RoomRental.Controllers
             }
 
             return View(room);
+        }
+
+        public async Task<IActionResult> DeleteImage(int imageId, int roomId)
+        {
+            await _imageCache.Delete(await _imageCache.GetImageAtId(imageId));
+
+            return RedirectToAction(nameof(Edit), new RouteValueDictionary
+            {
+                { "id", roomId }
+            });
+        }
+
+        public async Task<IActionResult> AddImage(List<IFormFile> images, int roomId)
+        {
+            string[] paths = new string[images.Count()];
+            for (int i = 0; i < paths.Length; i++)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(images[i].FileName);
+
+                using (var fileStream = new FileStream(_appEnvironment.WebRootPath + Path.Combine("\\images\\Rooms\\", fileName), FileMode.Create))
+                {
+                    await images[i].CopyToAsync(fileStream);
+                }
+
+                await _imageCache.Add(new RoomImage()
+                {
+                    ImagePath = Path.Combine("\\images\\Rooms\\", fileName),
+                    RoomId = roomId
+                });
+            }
+
+            return RedirectToAction(nameof(Edit), new RouteValueDictionary
+            {
+                { "id", roomId }
+            });
         }
 
         // POST: Rooms/Delete/5

@@ -80,7 +80,14 @@
                                 @Html.DisplayFor(modelItem => item.Description)
                             </td>
                             <td class="element">
-                                <img src="@item.RoomImages.First().ImagePath" class="image">
+                                @if (@item.RoomImages.Count() == 0)
+                                {
+                                    <span>НЕТ ФОТО</span>
+                                }
+                                else
+                                {
+                                    <img src="@item.RoomImages.First().ImagePath" class="image">
+                                }
                             </td>
                             <td class="element">
                                 <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.RoomId">Изменить</a> |

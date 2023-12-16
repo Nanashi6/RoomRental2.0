@@ -111,6 +111,15 @@ namespace RoomRental.Controllers
         public async Task<ActionResult> Delete(string id)
         {
             User user = await _userManager.FindByIdAsync(id);
+
+            var invoices = _context.Invoices.Where(e => e.ResponsiblePersonId == id).ToList();
+
+            if (invoices != null)
+            {
+                _context.RemoveRange(invoices);
+                _context.SaveChanges();
+            }
+
             if (user != null)
             {
                 IdentityResult result = await _userManager.DeleteAsync(user);

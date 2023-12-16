@@ -29,6 +29,7 @@ public partial class Room
     [Required(ErrorMessage = "Не указано фото")]
     [Display(Name = "Фото")]
     [NotMapped]
+    [ValidateNever]
     public List<IFormFile> Photos { get; set; }
 
     [Display(Name = "Здание")]

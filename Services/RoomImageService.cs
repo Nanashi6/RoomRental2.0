@@ -11,6 +11,11 @@ namespace RoomRental.Services
     {
         public RoomImageService(RoomRentalsContext context, IMemoryCache memoryCache, UserManager<User> userManager, HttpContextAccessor httpContext) : base(memoryCache, context, "RoomImages", userManager.GetUserAsync(httpContext.HttpContext.User).Result) { }
 
+        public async Task<RoomImage> GetImageAtId(int? id)
+        {
+            return (await GetAll()).Single(e => e.ImageId == id);
+        }
+
         public async override Task<RoomImage> Get(int? id)
         {
             return (await GetAll()).Single(e => e.RoomId == id);
@@ -29,6 +34,8 @@ namespace RoomRental.Services
             }
 
             await _context.SaveChangesAsync();
+            base.RefreshCache();
+
             await UpdateCache();
         }
 
