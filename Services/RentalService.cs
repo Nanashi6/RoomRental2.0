@@ -35,8 +35,22 @@ namespace RoomRental.Services
         }
         public async override Task Update(Rental rental)
         {
+            var oldRental = await Get(rental.RentalId);
+            var invoices = _context.Invoices.Where(e => oldRental.CheckInDate == e.ConclusionDate && oldRental.RentalOrganizationId == e.RentalOrganizationId && oldRental.Room.RoomId == e.RoomId).ToArray();
+            if (invoices != null)
+            {
+                foreach (var item in invoices)
+                {
+                    item.RoomId = rental.RoomId;
+                    item.ConclusionDate = rental.CheckInDate;
+                    item.RentalOrganizationId = rental.RentalOrganizationId;
+                }
+                _context.Invoices.UpdateRange(invoices);
+            }
+
             _context.Update(rental);
             await _context.SaveChangesAsync();
+            RefreshCache();
             await UpdateCache();
         }
         public override async Task Delete(Rental rental)
@@ -67,13 +81,13 @@ namespace RoomRental.Services
             if (_httpContext.User.IsInRole("Admin"))
                 rentals = await _context.Rentals
                     .Include(e => e.Room)
-                    .Include(e => e.RentalOrganization)
+                    .Include(e => e.RentalOrganization).AsSplitQuery()
                     .ToListAsync();
             else if (_httpContext.User.IsInRole("User"))
                 rentals = await _context.Rentals
                     .Where(r => _roomService.GetAll().Result.Select(e => e.RoomId).Contains(r.RoomId) || r.RentalOrganizationId == _organizationId)
                     .Include(e => e.Room)
-                    .Include(e => e.RentalOrganization)
+                    .Include(e => e.RentalOrganization).AsSplitQuery()
                     .ToListAsync();
 
             if (rentals != null)

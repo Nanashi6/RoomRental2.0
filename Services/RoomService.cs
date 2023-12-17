@@ -42,6 +42,8 @@ namespace RoomRental.Services
 
         public async override Task Delete(Room room)
         {
+            RefreshCache();
+
             var rentals = await _context.Rentals.Where(e => e.RoomId == room.RoomId).ToListAsync();
             var invoices = await _context.Invoices.Where(e => e.RoomId == room.RoomId).ToListAsync();
 
@@ -57,15 +59,11 @@ namespace RoomRental.Services
 
             if (room != null)
             {
+                _context.Entry(room).State = EntityState.Detached;
                 _context.Rooms.Remove(room);
             }
 
             await _context.SaveChangesAsync();
-
-            _cache.Remove("Rentals" + _user.OrganizationId);
-            _cache.Remove("Rentals");
-            _cache.Remove("Invoices" + _user.OrganizationId);
-            _cache.Remove("Invoices");
 
             await UpdateCache();
         }

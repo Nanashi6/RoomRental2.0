@@ -23,6 +23,22 @@ namespace RoomRental.Data
             var organizations = context.Organizations.ToArray();
             if (!context.Users.Any()) 
             {
+                /*var admin = new User
+                {
+                    Surname = $"Ёвженко",
+                    Name = $"Юрий",
+                    Lastname = $"Дмитриевич",
+                    UserName = $"Admin",
+                    Email = $"admin@mail.com",
+                    OrganizationId = organizations[0].OrganizationId,
+                    Organization = organizations[0]
+                };
+                var resultAdmin = await userManager.CreateAsync(admin, "123456");
+                if (resultAdmin.Succeeded)
+                {
+                    var res = await userManager.AddToRolesAsync(admin, new List<string>() { "User", "Admin" });
+                }*/
+
                 for (int i = 0; i < 100; i++)
                 {
                     var user = new User
@@ -87,7 +103,7 @@ namespace RoomRental.Data
                     DateTime checkOutDate = checkInDate.AddMonths(1);
                     DateTime paymentDate = GenerateRandomDate(checkInDate, checkOutDate);
 
-                    int roomId = rnd.Next(rooms.Count() + 1);
+                    int roomId = rnd.Next(rooms.Count());
                     var room = rooms[roomId];
                     
                     var building = buildings.Single(b => b.BuildingId == room.BuildingId);
@@ -121,6 +137,23 @@ namespace RoomRental.Data
                         ResponsiblePerson = person
                     });
                 }
+
+                var admin = new User
+                {
+                    Surname = $"Ёвженко",
+                    Name = $"Юрий",
+                    Lastname = $"Дмитриевич",
+                    UserName = $"Admin",
+                    Email = $"admin@mail.com",
+                    OrganizationId = organizations[0].OrganizationId,
+                    Organization = organizations[0]
+                };
+                var resultAdmin = await userManager.CreateAsync(admin, "123456");
+                if (resultAdmin.Succeeded)
+                {
+                    var res = await userManager.AddToRolesAsync(admin, new List<string>() { "User", "Admin" });
+                }
+
                 context.SaveChanges();
             }
         }  

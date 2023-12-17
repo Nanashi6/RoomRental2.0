@@ -22,8 +22,10 @@ namespace RoomRental
 
         public void ConfigureServices(IServiceCollection services)
         {
+            Console.WriteLine(DateOnly.FromDateTime(DateTime.Now));
+
             string connection = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<RoomRentalsContext>(options => { options.UseSqlServer(connection); options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking); }, ServiceLifetime.Scoped);
+            services.AddDbContext<RoomRentalsContext>(options => { options.UseSqlServer(connection); /*options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);*/ }, ServiceLifetime.Scoped);
 
             //Добавление классов авторизации
             services.AddIdentity<User, IdentityRole>(opts =>

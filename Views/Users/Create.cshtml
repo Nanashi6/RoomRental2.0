@@ -33,6 +33,10 @@
                 <label asp-for="OrganizationId" class="control-label">Организация</label>
                 <select id="select" asp-for="OrganizationId" class="filter-input" asp-items="ViewBag.OrganizationId"></select>
             </div>
+            <div class="form-div">
+                <label asp-for="Password" class="control-label">Пароль</label>
+                <input class="filter-input" type="text" asp-for="Password" class="form-control" placeholder="Пароль" />
+            </div>
             <button type="submit" class="submitButton-index">Добавить</button>
         </form>
     </div>
